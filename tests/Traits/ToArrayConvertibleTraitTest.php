@@ -11,18 +11,18 @@
 
 namespace Dmytrof\ArrayConvertible\Tests\Traits;
 
-use Dmytrof\ArrayConvertible\ArrayConvertibleInterface;
-use Dmytrof\ArrayConvertible\Exception\ArrayConvertibleException;
-use Dmytrof\ArrayConvertible\Traits\ArrayConvertibleTrait;
+use Dmytrof\ArrayConvertible\ToArrayConvertibleInterface;
+use Dmytrof\ArrayConvertible\Exception\ToArrayConvertibleException;
+use Dmytrof\ArrayConvertible\Traits\ToArrayConvertibleTrait;
 use PHPUnit\Framework\TestCase;
 
-class ArrayConvertibleTraitTest extends TestCase
+class ToArrayConvertibleTraitTest extends TestCase
 {
     public function testConvertToArrayValue(): void
     {
-        $object = new class implements ArrayConvertibleInterface
+        $object = new class implements ToArrayConvertibleInterface
         {
-            use ArrayConvertibleTrait {
+            use ToArrayConvertibleTrait {
                 convertToArrayValue AS public;
             }
             public $foo = 1;
@@ -55,19 +55,19 @@ class ArrayConvertibleTraitTest extends TestCase
         try {
             $object->convertToArrayValue(new \stdClass());
             $this->fail('stdClass converting to array is allowed');
-        } catch (ArrayConvertibleException $e) {
+        } catch (ToArrayConvertibleException $e) {
         }
 
         try {
             $f = tmpfile();
             $object->convertToArrayValue($f);
             $this->fail('resource converting to array is allowed');
-        } catch (ArrayConvertibleException $e) {
+        } catch (ToArrayConvertibleException $e) {
         }
 
-        $object = new class implements ArrayConvertibleInterface
+        $object = new class implements ToArrayConvertibleInterface
         {
-            use ArrayConvertibleTrait {
+            use ToArrayConvertibleTrait {
                 convertToArrayValue as private __convertToArrayValue;
             }
 
@@ -94,7 +94,7 @@ class ArrayConvertibleTraitTest extends TestCase
             {
                 try {
                     return $this->__convertToArrayValue($value);
-                } catch (ArrayConvertibleException $e) {
+                } catch (ToArrayConvertibleException $e) {
                     if ($value instanceof \Closure) {
                         return $value->call($this);
                     }
@@ -118,9 +118,9 @@ class ArrayConvertibleTraitTest extends TestCase
 
     public function testConvertToArrayData(): void
     {
-        $object = new class implements ArrayConvertibleInterface
+        $object = new class implements ToArrayConvertibleInterface
         {
-            use ArrayConvertibleTrait {
+            use ToArrayConvertibleTrait {
                 convertToArrayData AS public;
             }
             public $foo = 1;
@@ -156,25 +156,25 @@ class ArrayConvertibleTraitTest extends TestCase
 
     public function testGetNotArrayConvertibleProperties(): void
     {
-        $objectWithoutConst = new class implements ArrayConvertibleInterface
+        $objectWithoutConst = new class implements ToArrayConvertibleInterface
         {
-            use ArrayConvertibleTrait {
+            use ToArrayConvertibleTrait {
                 getNotArrayConvertibleProperties AS public;
             }
         };
 
-        $object1 = new class implements ArrayConvertibleInterface
+        $object1 = new class implements ToArrayConvertibleInterface
         {
-            use ArrayConvertibleTrait {
+            use ToArrayConvertibleTrait {
                 getNotArrayConvertibleProperties AS public;
             }
 
             protected const ARRAY_NOT_CONVERTIBLE_PROPERTIES = 'test';
         };
 
-        $object2 = new class implements ArrayConvertibleInterface
+        $object2 = new class implements ToArrayConvertibleInterface
         {
-            use ArrayConvertibleTrait {
+            use ToArrayConvertibleTrait {
                 getNotArrayConvertibleProperties AS public;
             }
 
@@ -187,9 +187,9 @@ class ArrayConvertibleTraitTest extends TestCase
 
     public function testToArray(): void
     {
-        $objectWithoutConst = new class implements ArrayConvertibleInterface
+        $objectWithoutConst = new class implements ToArrayConvertibleInterface
         {
-            use ArrayConvertibleTrait;
+            use ToArrayConvertibleTrait;
 
             public $foo = 1;
             protected $bar = 'bar';
@@ -200,9 +200,9 @@ class ArrayConvertibleTraitTest extends TestCase
             ];
         };
 
-        $object1 = new class implements ArrayConvertibleInterface
+        $object1 = new class implements ToArrayConvertibleInterface
         {
-            use ArrayConvertibleTrait;
+            use ToArrayConvertibleTrait;
 
             protected const ARRAY_NOT_CONVERTIBLE_PROPERTIES = 'foo';
 
@@ -215,9 +215,9 @@ class ArrayConvertibleTraitTest extends TestCase
             ];
         };
 
-        $object2 = new class ($objectWithoutConst, $object1) implements ArrayConvertibleInterface
+        $object2 = new class ($objectWithoutConst, $object1) implements ToArrayConvertibleInterface
         {
-            use ArrayConvertibleTrait;
+            use ToArrayConvertibleTrait;
 
             protected const ARRAY_NOT_CONVERTIBLE_PROPERTIES = ['foo', 'bar'];
 
@@ -238,9 +238,9 @@ class ArrayConvertibleTraitTest extends TestCase
             }
         };
 
-        $object3 = new class ($objectWithoutConst, $object1) implements ArrayConvertibleInterface
+        $object3 = new class ($objectWithoutConst, $object1) implements ToArrayConvertibleInterface
         {
-            use ArrayConvertibleTrait;
+            use ToArrayConvertibleTrait;
 
             protected const ARRAY_NOT_CONVERTIBLE_PROPERTIES = ['foo', 'bar'];
 
@@ -307,7 +307,7 @@ class ArrayConvertibleTraitTest extends TestCase
             ],
         ], $object2->toArray());
 
-        $this->expectException(ArrayConvertibleException::class);
+        $this->expectException(ToArrayConvertibleException::class);
         $object3->toArray();
     }
 }

@@ -11,10 +11,10 @@
 
 namespace Dmytrof\ArrayConvertible\Traits;
 
-use Dmytrof\ArrayConvertible\ArrayConvertibleInterface;
-use Dmytrof\ArrayConvertible\Exception\ArrayConvertibleException;
+use Dmytrof\ArrayConvertible\ToArrayConvertibleInterface;
+use Dmytrof\ArrayConvertible\Exception\ToArrayConvertibleException;
 
-trait ArrayConvertibleTrait
+trait ToArrayConvertibleTrait
 {
     /**
      * Converts object to array
@@ -42,11 +42,11 @@ trait ArrayConvertibleTrait
         if (is_array($value)) {
             return $this->convertToArrayData($value);
         }
-        if ($value instanceof ArrayConvertibleInterface) {
+        if ($value instanceof ToArrayConvertibleInterface) {
             return $value->toArray();
         }
 
-        throw new ArrayConvertibleException(sprintf('Unsupported array convertible type \'%s\'', is_object($value) ? get_class($value) : gettype($value)));
+        throw new ToArrayConvertibleException(sprintf('Unsupported array convertible type \'%s\'', is_object($value) ? get_class($value) : gettype($value)));
     }
 
     /**

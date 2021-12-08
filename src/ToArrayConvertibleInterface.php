@@ -11,7 +11,7 @@
 
 namespace Dmytrof\ArrayConvertible;
 
-interface ArrayConvertibleInterface
+interface ToArrayConvertibleInterface
 {
     /**
      * Converts object to array
