@@ -49,18 +49,26 @@ trait FromArrayConvertibleTrait
             throw new FromArrayConvertibleException(sprintf('Unable to set \'%s\' property: %s', $property, $e->getMessage()));
         }
 
-        if (in_array($propertyType->getName(), ['string', 'int', 'float', 'bool'])) { // is scalar
+        if (in_array($propertyType->getName(), ['string', 'int', 'float', 'bool'], true)) { // is scalar
             if (!(is_null($dataValue) && $propertyType->allowsNull())) {
                 settype($dataValue, $propertyType->getName());
             }
             $setValue->call($this, $dataValue);
-        } elseif ($propertyType->getName() === 'array') { // is array
+
+            return;
+        }
+        if ($propertyType->getName() === 'array') { // is array
             $setValue->call($this, array_merge((array) $value, (array) $dataValue));
-        } elseif (is_subclass_of($propertyType->getName(), FromArrayConvertibleInterface::class)) {
+
+            return;
+        }
+        if (is_subclass_of($propertyType->getName(), FromArrayConvertibleInterface::class)) {
             if (!$value instanceof FromArrayConvertibleInterface) {
                 throw new FromArrayConvertibleException(sprintf('Unable to set from array \'%s\' property \'%s\' which is not object', FromArrayConvertibleInterface::class, $property));
             }
             $value->fromArray($dataValue);
+
+            return;
         }
 
         throw new FromArrayConvertibleException(sprintf('Unsupported array convertible type \'%s\'', $propertyType->getName()));
