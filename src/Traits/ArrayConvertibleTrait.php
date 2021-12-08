@@ -17,7 +17,7 @@ use Dmytrof\ArrayConvertible\Exception\ArrayConvertibleException;
 trait ArrayConvertibleTrait
 {
     /**
-     * Converts configuration to array
+     * Converts object to array
      * @return array
      */
     public function toArray(): array
@@ -26,7 +26,7 @@ trait ArrayConvertibleTrait
     }
 
     /**
-     * Returns value converted for toArray
+     * Returns converted value
      * @param $value
      *
      * @return array|bool|float|int|string|null
@@ -50,7 +50,7 @@ trait ArrayConvertibleTrait
     }
 
     /**
-     * Converts data to array
+     * Converts array data to array
      * @param array $data
      *
      * @return array
