@@ -22,7 +22,7 @@ trait ToArrayConvertibleTrait
      */
     public function toArray(): array
     {
-        return $this->convertToArrayData(array_diff_key(get_object_vars($this), array_fill_keys($this->getNotArrayConvertibleProperties(), true)));
+        return $this->convertToArrayData(array_diff_key(get_object_vars($this), array_fill_keys($this->getToArrayNotConvertibleProperties(), true)));
     }
 
     /**
@@ -69,10 +69,10 @@ trait ToArrayConvertibleTrait
      * Returns not convertible properties
      * @return array|string[]
      */
-    protected function getNotArrayConvertibleProperties(): array
+    protected function getToArrayNotConvertibleProperties(): array
     {
         try {
-            $constant_reflex = new \ReflectionClassConstant(static::class, 'ARRAY_NOT_CONVERTIBLE_PROPERTIES');
+            $constant_reflex = new \ReflectionClassConstant(static::class, 'TO_ARRAY_NOT_CONVERTIBLE_PROPERTIES');
 
             return (array) $constant_reflex->getValue();
         } catch (\ReflectionException $e) {

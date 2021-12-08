@@ -71,7 +71,7 @@ class ToArrayConvertibleTraitTest extends TestCase
                 convertToArrayValue as private __convertToArrayValue;
             }
 
-            private const ARRAY_NOT_CONVERTIBLE_PROPERTIES = ['notConvertibleProperty'];
+            private const TO_ARRAY_NOT_CONVERTIBLE_PROPERTIES = ['notConvertibleProperty'];
 
             public $foo = 1;
             protected $bar = 'bar';
@@ -159,30 +159,31 @@ class ToArrayConvertibleTraitTest extends TestCase
         $objectWithoutConst = new class implements ToArrayConvertibleInterface
         {
             use ToArrayConvertibleTrait {
-                getNotArrayConvertibleProperties AS public;
+                getToArrayNotConvertibleProperties AS public;
             }
         };
 
         $object1 = new class implements ToArrayConvertibleInterface
         {
             use ToArrayConvertibleTrait {
-                getNotArrayConvertibleProperties AS public;
+                getToArrayNotConvertibleProperties AS public;
             }
 
-            protected const ARRAY_NOT_CONVERTIBLE_PROPERTIES = 'test';
+            protected const TO_ARRAY_NOT_CONVERTIBLE_PROPERTIES = 'test';
         };
 
         $object2 = new class implements ToArrayConvertibleInterface
         {
             use ToArrayConvertibleTrait {
-                getNotArrayConvertibleProperties AS public;
+                getToArrayNotConvertibleProperties AS public;
             }
 
-            protected const ARRAY_NOT_CONVERTIBLE_PROPERTIES = ['foo', 'bar'];
+            protected const TO_ARRAY_NOT_CONVERTIBLE_PROPERTIES = ['foo', 'bar'];
         };
 
-        $this->assertEquals(['test'], $object1->getNotArrayConvertibleProperties());
-        $this->assertEquals(['foo', 'bar'], $object2->getNotArrayConvertibleProperties());
+        $this->assertEquals([], $objectWithoutConst->getToArrayNotConvertibleProperties());
+        $this->assertEquals(['test'], $object1->getToArrayNotConvertibleProperties());
+        $this->assertEquals(['foo', 'bar'], $object2->getToArrayNotConvertibleProperties());
     }
 
     public function testToArray(): void
@@ -204,7 +205,7 @@ class ToArrayConvertibleTraitTest extends TestCase
         {
             use ToArrayConvertibleTrait;
 
-            protected const ARRAY_NOT_CONVERTIBLE_PROPERTIES = 'foo';
+            protected const TO_ARRAY_NOT_CONVERTIBLE_PROPERTIES = 'foo';
 
             public $foo = 1;
             protected $bar = 'bar';
@@ -219,7 +220,7 @@ class ToArrayConvertibleTraitTest extends TestCase
         {
             use ToArrayConvertibleTrait;
 
-            protected const ARRAY_NOT_CONVERTIBLE_PROPERTIES = ['foo', 'bar'];
+            protected const TO_ARRAY_NOT_CONVERTIBLE_PROPERTIES = ['foo', 'bar'];
 
             public $foo = 1;
             protected $bar = 'bar';
@@ -242,7 +243,7 @@ class ToArrayConvertibleTraitTest extends TestCase
         {
             use ToArrayConvertibleTrait;
 
-            protected const ARRAY_NOT_CONVERTIBLE_PROPERTIES = ['foo', 'bar'];
+            protected const TO_ARRAY_NOT_CONVERTIBLE_PROPERTIES = ['foo', 'bar'];
 
             public $foo = 1;
             protected $bar = 'bar';

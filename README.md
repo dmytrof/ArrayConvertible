@@ -21,12 +21,12 @@ Supported properties types:
 ### Example 1:
     <?php
 
-    use Dmytrof\ArrayConvertible\ArrayConvertibleInterface;
-    use Dmytrof\ArrayConvertible\Traits\ArrayConvertibleTrait; 
+    use Dmytrof\ArrayConvertible\ToArrayConvertibleInterface;
+    use Dmytrof\ArrayConvertible\Traits\ToArrayConvertibleTrait; 
         
-    class SomeClass implements ArrayConvertibleInterface
+    class SomeClass implements ToArrayConvertibleInterface
     {
-        use ArrayConvertibleTrait;
+        use ToArrayConvertibleTrait;
 
         public $foo = 1;
         protected $bar = 'bar';
@@ -53,19 +53,19 @@ Supported properties types:
 
 ### Example 2 (Exclude no needed properties):
 
-To exclude some properties from toArray result add const `ARRAY_NOT_CONVERTIBLE_PROPERTIES` to your class or 
-redefine `getNotArrayConvertibleProperties` method in your class.
+To exclude some properties from toArray result add const `TO_ARRAY_NOT_CONVERTIBLE_PROPERTIES` to your class or 
+redefine `getToArrayNotConvertibleProperties` method in your class.
 
     <?php
 
-    use Dmytrof\ArrayConvertible\ArrayConvertibleInterface;
-    use Dmytrof\ArrayConvertible\Traits\ArrayConvertibleTrait; 
+    use Dmytrof\ArrayConvertible\ToArrayConvertibleInterface;
+    use Dmytrof\ArrayConvertible\Traits\ToArrayConvertibleTrait; 
         
-    class SomeClass implements ArrayConvertibleInterface
+    class SomeClass implements ToArrayConvertibleInterface
     {
-        use ArrayConvertibleTrait;
+        use ToArrayConvertibleTrait;
 
-        private const ARRAY_NOT_CONVERTIBLE_PROPERTIES = ['notConvertibleProperty'];
+        private const TO_ARRAY_NOT_CONVERTIBLE_PROPERTIES = ['notConvertibleProperty'];
 
         public $foo = 1;
         protected $bar = 'bar';
@@ -97,16 +97,16 @@ To convert properties of unsupported types extend method `convertToArrayValue`.
 
     <?php
 
-    use Dmytrof\ArrayConvertible\ArrayConvertibleInterface;
-    use Dmytrof\ArrayConvertible\Traits\ArrayConvertibleTrait; 
+    use Dmytrof\ArrayConvertible\ToArrayConvertibleInterface;
+    use Dmytrof\ArrayConvertible\Traits\ToArrayConvertibleTrait; 
         
-    class SomeClass implements ArrayConvertibleInterface
+    class SomeClass implements ToArrayConvertibleInterface
     {
-        use ArrayConvertibleTrait {
+        use ToArrayConvertibleTrait {
             convertToArrayValue as private __convertToArrayValue;
         }
 
-        private const ARRAY_NOT_CONVERTIBLE_PROPERTIES = ['notConvertibleProperty'];
+        private const TO_ARRAY_NOT_CONVERTIBLE_PROPERTIES = ['notConvertibleProperty'];
 
         public $foo = 1;
         protected $bar = 'bar';
@@ -129,7 +129,7 @@ To convert properties of unsupported types extend method `convertToArrayValue`.
         {
             try {
                 return $this->__convertToArrayValue($value);
-            } catch (ArrayConvertibleException $e) {
+            } catch (ToArrayConvertibleException $e) {
                 if ($value instanceof \Closure) {
                     return $value->call($this);
                 }
