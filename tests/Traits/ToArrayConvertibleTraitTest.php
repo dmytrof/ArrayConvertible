@@ -25,9 +25,9 @@ class ToArrayConvertibleTraitTest extends TestCase
             use ToArrayConvertibleTrait {
                 convertToArrayValue AS public;
             }
-            public $foo = 1;
-            protected $bar = 'bar';
-            private $baz = [
+            public int $foo = 1;
+            protected ?string $bar = 'bar';
+            private array $baz = [
                 'hello' => 'world',
                 4,
                 null,
@@ -73,15 +73,15 @@ class ToArrayConvertibleTraitTest extends TestCase
 
             private const TO_ARRAY_NOT_CONVERTIBLE_PROPERTIES = ['notConvertibleProperty'];
 
-            public $foo = 1;
-            protected $bar = 'bar';
-            private $baz = [
+            public int $foo = 1;
+            protected ?string $bar = 'bar';
+            private array $baz = [
                 'hello' => 'world',
                 4,
                 null,
             ];
-            private $closure;
-            private $notConvertibleProperty; // Must be avoided in toArray
+            private \Closure $closure;
+            private bool $notConvertibleProperty; // Must be avoided in toArray
 
             public function __construct()
             {
@@ -123,9 +123,9 @@ class ToArrayConvertibleTraitTest extends TestCase
             use ToArrayConvertibleTrait {
                 convertToArrayData AS public;
             }
-            public $foo = 1;
-            protected $bar = 'bar';
-            private $baz = [
+            public int $foo = 1;
+            protected ?string $bar = 'bar';
+            private array $baz = [
                 'hello' => 'world',
                 4,
                 null,
@@ -192,9 +192,9 @@ class ToArrayConvertibleTraitTest extends TestCase
         {
             use ToArrayConvertibleTrait;
 
-            public $foo = 1;
-            protected $bar = 'bar';
-            private $baz = [
+            public int $foo = 1;
+            protected ?string $bar = 'bar';
+            private array $baz = [
                 'hello' => 'world',
                 4,
                 null,
@@ -207,9 +207,9 @@ class ToArrayConvertibleTraitTest extends TestCase
 
             protected const TO_ARRAY_NOT_CONVERTIBLE_PROPERTIES = 'foo';
 
-            public $foo = 1;
-            protected $bar = 'bar';
-            private $baz = [
+            public int $foo = 1;
+            protected ?string $bar = 'bar';
+            private array $baz = [
                 'hello' => 'world',
                 4,
                 null,
@@ -222,10 +222,10 @@ class ToArrayConvertibleTraitTest extends TestCase
 
             protected const TO_ARRAY_NOT_CONVERTIBLE_PROPERTIES = ['foo', 'bar'];
 
-            public $foo = 1;
-            protected $bar = 'bar';
+            public int $foo = 1;
+            protected ?string $bar = 'bar';
             protected $objectWithoutConst;
-            private $baz = [
+            private array $baz = [
                 'hello' => 'world',
                 4,
                 null,
@@ -245,10 +245,10 @@ class ToArrayConvertibleTraitTest extends TestCase
 
             protected const TO_ARRAY_NOT_CONVERTIBLE_PROPERTIES = ['foo', 'bar'];
 
-            public $foo = 1;
-            protected $bar = 'bar';
+            public int $foo = 1;
+            protected ?string $bar = 'bar';
             protected $objectWithoutConst;
-            private $baz = [
+            private array $baz = [
                 'hello' => 'world',
                 4,
                 null,
