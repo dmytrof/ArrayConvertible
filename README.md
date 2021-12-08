@@ -53,7 +53,7 @@ Supported properties types:
 
 ### Example 2 (Exclude no needed properties):
 
-To exclude some properties from toArray result add const `TO_ARRAY_NOT_CONVERTIBLE_PROPERTIES` to your class or 
+To exclude some properties from toArray result add const `TO_ARRAY_NOT_CONVERTIBLE_PROPERTIES` or `ARRAY_NOT_CONVERTIBLE_PROPERTIES` to your class or 
 redefine `getToArrayNotConvertibleProperties` method in your class.
 
     <?php
@@ -65,7 +65,7 @@ redefine `getToArrayNotConvertibleProperties` method in your class.
     {
         use ToArrayConvertibleTrait;
 
-        private const TO_ARRAY_NOT_CONVERTIBLE_PROPERTIES = ['notConvertibleProperty'];
+        private const ARRAY_NOT_CONVERTIBLE_PROPERTIES = ['notConvertibleProperty'];
 
         public $foo = 1;
         protected $bar = 'bar';

@@ -169,7 +169,7 @@ class ToArrayConvertibleTraitTest extends TestCase
                 getToArrayNotConvertibleProperties AS public;
             }
 
-            protected const TO_ARRAY_NOT_CONVERTIBLE_PROPERTIES = 'test';
+            protected const ARRAY_NOT_CONVERTIBLE_PROPERTIES = 'test';
         };
 
         $object2 = new class implements ToArrayConvertibleInterface

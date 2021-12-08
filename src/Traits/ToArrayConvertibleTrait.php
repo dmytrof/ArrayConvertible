@@ -71,12 +71,13 @@ trait ToArrayConvertibleTrait
      */
     protected function getToArrayNotConvertibleProperties(): array
     {
-        try {
-            $constant_reflex = new \ReflectionClassConstant(static::class, 'TO_ARRAY_NOT_CONVERTIBLE_PROPERTIES');
-
-            return (array) $constant_reflex->getValue();
-        } catch (\ReflectionException $e) {
-            return [];
+        foreach (['TO_ARRAY_NOT_CONVERTIBLE_PROPERTIES', 'ARRAY_NOT_CONVERTIBLE_PROPERTIES'] as $constant) {
+            try {
+                return (array) (new \ReflectionClassConstant(static::class, $constant))->getValue();
+            } catch (\ReflectionException $e) {
+            }
         }
+
+        return [];
     }
 }
