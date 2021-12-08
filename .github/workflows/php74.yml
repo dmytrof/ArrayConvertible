@@ -1,4 +1,4 @@
-name: PHP7.1 Composer v1
+name: PHP7.4
 
 on: [push]
 
@@ -13,8 +13,8 @@ jobs:
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '7.1'
-        tools: composer:v1, phpunit:v8.5, composer-require-checker, php-config
+        php-version: '7.4'
+        tools: composer:v2, phpunit:v8.5, composer-require-checker, php-config
 
     - name: PHP version
       run: php --version
