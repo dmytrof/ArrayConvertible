@@ -27,8 +27,7 @@ class FromArrayConvertibleTraitTest extends TestCase
             protected ?string $bar = 'bar';
             private array $baz = [
                 'hello' => 'world',
-                4,
-                null,
+                'test' => 'pest',
             ];
 
             public function getAllVars(): array
@@ -42,8 +41,6 @@ class FromArrayConvertibleTraitTest extends TestCase
             'bar' => null,
             'baz' => [
                 'hello' => 'mello',
-                7,
-                'not null',
                 'woo' => 'hoo',
             ],
         ]);
@@ -53,8 +50,7 @@ class FromArrayConvertibleTraitTest extends TestCase
             'bar' => null,
             'baz' => [
                 'hello' => 'mello',
-                7,
-                'not null',
+                'test' => 'pest',
                 'woo' => 'hoo',
             ],
         ], $object->getAllVars());

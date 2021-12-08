@@ -37,6 +37,7 @@ trait FromArrayConvertibleTrait
     {
         $method = 'set'.ucfirst($property);
         $setValue = function ($dataValue) use ($property, $method) {
+            var_dump($property, $dataValue);
             if (method_exists($this, $method)) {
                 $this->$method($dataValue);
             } else {
