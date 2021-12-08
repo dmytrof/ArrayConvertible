@@ -16,8 +16,6 @@ interface FromArrayConvertibleInterface
     /**
      * Merges array data to object
      * @param array $data
-     *
-     * @return $this
      */
-    public function fromArray(array $data): self;
+    public function fromArray(array $data): void;
 }

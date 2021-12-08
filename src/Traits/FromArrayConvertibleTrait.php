@@ -20,13 +20,11 @@ trait FromArrayConvertibleTrait
      * Merges object with array data
      * @param array $data
      *
-     * @return FromArrayConvertibleInterface
+     * @return void
      */
-    public function fromArray(array $data): FromArrayConvertibleInterface
+    public function fromArray(array $data): void
     {
         $this->convertFromArrayData(array_diff_key(get_object_vars($this), array_fill_keys($this->getFromArrayNotConvertibleProperties(), true)), $data);
-
-        return $this;
     }
 
     /**
@@ -38,6 +36,13 @@ trait FromArrayConvertibleTrait
     protected function convertFromArrayValue(string $property, $value, $dataValue): void
     {
         $method = 'set'.ucfirst($property);
+        $setValue = function ($dataValue) use ($property, $method) {
+            if (method_exists($this, $method)) {
+                $this->$method($dataValue);
+            } else {
+                $this->$property = $dataValue;
+            }
+        };
         try {
             $propertyType = (new \ReflectionProperty($this, $property))->getType();
         } catch (\ReflectionException $e) {
@@ -48,9 +53,9 @@ trait FromArrayConvertibleTrait
             if (!(is_null($dataValue) && $propertyType->allowsNull())) {
                 settype($dataValue, $propertyType->getName());
             }
-            $this->$method($dataValue);
+            $setValue->call($this, $dataValue);
         } elseif ($propertyType->getName() === 'array') { // is array
-            $this->$method(array_merge((array) $value, (array) $dataValue));
+            $setValue->call($this, array_merge((array) $value, (array) $dataValue));
         } elseif (is_subclass_of($propertyType->getName(), FromArrayConvertibleInterface::class)) {
             if (!$value instanceof FromArrayConvertibleInterface) {
                 throw new FromArrayConvertibleException(sprintf('Unable to set from array \'%s\' property \'%s\' which is not object', FromArrayConvertibleInterface::class, $property));
