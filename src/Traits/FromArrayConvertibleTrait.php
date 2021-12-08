@@ -83,7 +83,7 @@ trait FromArrayConvertibleTrait
     protected function convertFromArrayData($properties, array $data): void
     {
         foreach ($properties as $property => $value) {
-            if (!isset($data[$property])) {
+            if (!array_key_exists($property, $data)) {
                 continue;
             }
             $this->convertFromArrayValue($property, $value, $data[$property]);
