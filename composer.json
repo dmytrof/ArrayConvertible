@@ -1,0 +1,32 @@
+{
+    "name": "dmytrof/array-convertible",
+    "type": "library",
+    "description": "Helps convert objects to array",
+    "keywords": ["array", "array convertible", "toArray"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Dmytro Feshchenko",
+            "email": "dmytro.feshchenko@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.1 || ^8.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^8.3 || ^9.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Dmytrof\\ArrayConvertible\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Dmytrof\\ArrayConvertible\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit"
+    }
+}
