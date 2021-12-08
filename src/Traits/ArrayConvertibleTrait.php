@@ -46,7 +46,7 @@ trait ArrayConvertibleTrait
             return $value->toArray();
         }
 
-        throw new ArrayConvertibleException(sprintf('Unsupported array convertible type %s', gettype($value)));
+        throw new ArrayConvertibleException(sprintf('Unsupported array convertible type \'%s\'', is_object($value) ? get_class($value) : gettype($value)));
     }
 
     /**

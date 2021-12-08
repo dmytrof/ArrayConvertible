@@ -64,6 +64,56 @@ class ArrayConvertibleTraitTest extends TestCase
             $this->fail('resource converting to array is allowed');
         } catch (ArrayConvertibleException $e) {
         }
+
+        $object = new class implements ArrayConvertibleInterface
+        {
+            use ArrayConvertibleTrait {
+                convertToArrayValue as private __convertToArrayValue;
+            }
+
+            private const ARRAY_NOT_CONVERTIBLE_PROPERTIES = ['notConvertibleProperty'];
+
+            public $foo = 1;
+            protected $bar = 'bar';
+            private $baz = [
+                'hello' => 'world',
+                4,
+                null,
+            ];
+            private $closure;
+            private $notConvertibleProperty; // Must be avoided in toArray
+
+            public function __construct()
+            {
+                $this->closure = function() {
+                    return 55;
+                };
+            }
+
+            public function convertToArrayValue($value)
+            {
+                try {
+                    return $this->__convertToArrayValue($value);
+                } catch (ArrayConvertibleException $e) {
+                    if ($value instanceof \Closure) {
+                        return $value->call($this);
+                    }
+                    throw $e;
+                }
+            }
+        };
+
+
+        $this->assertEquals([
+            'foo' => 1,
+            'bar' => 'bar',
+            'baz' => [
+                'hello' => 'world',
+                4,
+                null,
+            ],
+            'closure' => 55,
+        ], $object->convertToArrayValue($object));
     }
 
     public function testConvertToArrayData(): void
