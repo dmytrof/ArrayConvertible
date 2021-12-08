@@ -1,7 +1,7 @@
 {
     "name": "dmytrof/array-convertible",
     "type": "library",
-    "description": "Helps convert objects to array",
+    "description": "Library helps to convert object to array",
     "keywords": ["array", "array convertible", "toArray"],
     "license": "MIT",
     "authors": [
