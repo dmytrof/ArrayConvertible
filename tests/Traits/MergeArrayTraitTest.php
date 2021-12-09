@@ -12,7 +12,9 @@
 namespace Dmytrof\ArrayConvertible\Tests\Traits;
 
 use Dmytrof\ArrayConvertible\MergeArrayInterface;
+use Dmytrof\ArrayConvertible\ToArrayConvertibleInterface;
 use Dmytrof\ArrayConvertible\Traits\MergeArrayTrait;
+use Dmytrof\ArrayConvertible\Traits\ToArrayConvertibleTrait;
 use PHPUnit\Framework\TestCase;
 
 class MergeArrayTraitTest extends TestCase
@@ -55,9 +57,10 @@ class MergeArrayTraitTest extends TestCase
             ],
         ], $object->getAllVars());
 
-        $nestedObject = new class implements MergeArrayInterface
+        $nestedObject = new class implements MergeArrayInterface, ToArrayConvertibleInterface
         {
             use MergeArrayTrait;
+            use ToArrayConvertibleTrait;
 
             private const ARRAY_NOT_CONVERTIBLE_PROPERTIES = ['notConvertibleProperty'];
 
@@ -65,11 +68,6 @@ class MergeArrayTraitTest extends TestCase
             protected string $nested2 = 'bar';
             private ?string $nested3 = null;
             private string $notConvertibleProperty = 'qwe'; // Must be avoided in mergeArray and toArray
-
-            public function getAllVars(): array
-            {
-                return get_object_vars($this);
-            }
         };
 
 
@@ -95,7 +93,7 @@ class MergeArrayTraitTest extends TestCase
 
             public function getAllVars(): array
             {
-                return get_object_vars($this);
+                return array_merge(get_object_vars($this), ['nestedObject' => $this->nestedObject->toArray()]);
             }
         };
 
