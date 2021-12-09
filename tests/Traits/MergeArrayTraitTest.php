@@ -83,8 +83,7 @@ class MergeArrayTraitTest extends TestCase
             protected ?string $bar = 'bar';
             private array $baz = [
                 'hello' => 'world',
-                4,
-                null,
+                'test' => 'pest',
             ];
             private bool $notConvertibleProperty = false; // Must be avoided in mergeArray
             private $nestedObject;
