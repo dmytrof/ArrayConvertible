@@ -56,55 +56,55 @@ class MergeArrayTraitTest extends TestCase
         ], $object->getAllVars());
 
 
-//        $object = new class implements ToArrayConvertibleInterface
-//        {
-//            use ToArrayConvertibleTrait {
-//                convertToArrayValue as private __convertToArrayValue;
-//            }
-//
-//            private const TO_ARRAY_NOT_CONVERTIBLE_PROPERTIES = ['notConvertibleProperty'];
-//
-//            public $foo = 1;
-//            protected $bar = 'bar';
-//            private $baz = [
-//                'hello' => 'world',
-//                4,
-//                null,
-//            ];
-//            private $closure;
-//            private $notConvertibleProperty; // Must be avoided in toArray
-//
-//            public function __construct()
-//            {
-//                $this->closure = function() {
-//                    return 55;
-//                };
-//            }
-//
-//            public function convertToArrayValue($value)
-//            {
-//                try {
-//                    return $this->__convertToArrayValue($value);
-//                } catch (ToArrayConvertibleException $e) {
-//                    if ($value instanceof \Closure) {
-//                        return $value->call($this);
-//                    }
-//                    throw $e;
-//                }
-//            }
-//        };
-//
-//
-//        $this->assertEquals([
-//            'foo' => 1,
-//            'bar' => 'bar',
-//            'baz' => [
-//                'hello' => 'world',
-//                4,
-//                null,
-//            ],
-//            'closure' => 55,
-//        ], $object->convertToArrayValue($object));
+        $object = new class implements MergeArrayInterface
+        {
+            use MergeArrayTrait;
+
+            private const MERGE_ARRAY_NOT_SUPPORTED_PROPERTIES = ['notConvertibleProperty'];
+
+            public $foo = 1;
+            protected $bar = 'bar';
+            private $baz = [
+                'hello' => 'world',
+                4,
+                null,
+            ];
+            private $notConvertibleProperty; // Must be avoided in mergeArray
+
+            public function __construct()
+            {
+                $this->closure = function() {
+                    return 55;
+                };
+            }
+
+            public function getAllVars(): array
+            {
+                return get_object_vars($this);
+            }
+        };
+
+
+        $object->mergeArray([
+            'foo' => '12',
+            'bar' => null,
+            'baz' => [
+                'hello' => 'mello',
+                'woo' => 'hoo',
+            ],
+            'notConvertibleProperty' => 'not usable'
+        ]);
+
+        $this->assertEquals([
+            'foo' => 12,
+            'bar' => null,
+            'baz' => [
+                'hello' => 'mello',
+                'test' => 'pest',
+                'woo' => 'hoo',
+            ],
+            'notConvertibleProperty' => null
+        ], $object->getAllVars());
     }
 
 //    public function testConvertToArrayData(): void
