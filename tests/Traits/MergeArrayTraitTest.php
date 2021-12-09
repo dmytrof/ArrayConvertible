@@ -70,7 +70,6 @@ class MergeArrayTraitTest extends TestCase
             private string $notConvertibleProperty = 'qwe'; // Must be avoided in mergeArray and toArray
         };
 
-
         $object = new class ($nestedObject) implements MergeArrayInterface
         {
             use MergeArrayTrait;
@@ -96,7 +95,6 @@ class MergeArrayTraitTest extends TestCase
                 return array_merge(get_object_vars($this), ['nestedObject' => $this->nestedObject->toArray()]);
             }
         };
-
 
         $object->mergeArray([
             'foo' => '12',
@@ -130,37 +128,36 @@ class MergeArrayTraitTest extends TestCase
             ],
         ], $object->getAllVars());
     }
-//
-//    public function testGetNotArrayConvertibleProperties(): void
-//    {
-//        $objectWithoutConst = new class implements ToArrayConvertibleInterface
-//        {
-//            use ToArrayConvertibleTrait {
-//                getToArrayNotConvertibleProperties AS public;
-//            }
-//        };
-//
-//        $object1 = new class implements ToArrayConvertibleInterface
-//        {
-//            use ToArrayConvertibleTrait {
-//                getToArrayNotConvertibleProperties AS public;
-//            }
-//
-//            protected const ARRAY_NOT_CONVERTIBLE_PROPERTIES = 'test';
-//        };
-//
-//        $object2 = new class implements ToArrayConvertibleInterface
-//        {
-//            use ToArrayConvertibleTrait {
-//                getToArrayNotConvertibleProperties AS public;
-//            }
-//
-//            protected const TO_ARRAY_NOT_CONVERTIBLE_PROPERTIES = ['foo', 'bar'];
-//        };
-//
-//        $this->assertEquals([], $objectWithoutConst->getToArrayNotConvertibleProperties());
-//        $this->assertEquals(['test'], $object1->getToArrayNotConvertibleProperties());
-//        $this->assertEquals(['foo', 'bar'], $object2->getToArrayNotConvertibleProperties());
-//    }
 
+    public function testGetNotArrayConvertibleProperties(): void
+    {
+        $objectWithoutConst = new class implements MergeArrayInterface
+        {
+            use MergeArrayTrait {
+                getMergeArrayNotSupportedProperties AS public;
+            }
+        };
+
+        $object1 = new class implements MergeArrayInterface
+        {
+            use MergeArrayTrait {
+                getMergeArrayNotSupportedProperties AS public;
+            }
+
+            protected const ARRAY_NOT_CONVERTIBLE_PROPERTIES = 'test';
+        };
+
+        $object2 = new class implements MergeArrayInterface
+        {
+            use MergeArrayTrait {
+                getMergeArrayNotSupportedProperties AS public;
+            }
+
+            protected const MERGE_ARRAY_NOT_SUPPORTED_PROPERTIES = ['foo', 'bar'];
+        };
+
+        $this->assertEquals([], $objectWithoutConst->getMergeArrayNotSupportedProperties());
+        $this->assertEquals(['test'], $object1->getMergeArrayNotSupportedProperties());
+        $this->assertEquals(['foo', 'bar'], $object2->getMergeArrayNotSupportedProperties());
+    }
 }

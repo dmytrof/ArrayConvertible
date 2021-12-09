@@ -154,7 +154,7 @@ class ToArrayConvertibleTraitTest extends TestCase
         ], $object->convertToArrayData(['foo' => 'bar', 3, null, 'object' => $object]));
     }
 
-    public function testGetNotArrayConvertibleProperties(): void
+    public function testGetToNotArrayConvertibleProperties(): void
     {
         $objectWithoutConst = new class implements ToArrayConvertibleInterface
         {
