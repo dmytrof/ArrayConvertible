@@ -66,13 +66,6 @@ class MergeArrayTraitTest extends TestCase
             private ?string $nested3 = null;
             private string $notConvertibleProperty = 'qwe'; // Must be avoided in mergeArray and toArray
 
-            public function __construct()
-            {
-                $this->closure = function() {
-                    return 55;
-                };
-            }
-
             public function getAllVars(): array
             {
                 return get_object_vars($this);
