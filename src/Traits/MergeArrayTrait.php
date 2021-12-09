@@ -50,20 +50,21 @@ trait MergeArrayTrait
             throw new MergeArrayException(sprintf('Unable to set \'%s\' property: %s', $property, $e->getMessage()));
         }
 
-        if (in_array($propertyType->getName(), ['string', 'int', 'float', 'bool'], true)) { // is scalar
+        $typeName = $propertyType ? $propertyType->getName() : null;
+        if (in_array($typeName, ['string', 'int', 'float', 'bool'], true)) { // is scalar
             if (!(is_null($dataValue) && $propertyType->allowsNull())) {
-                settype($dataValue, $propertyType->getName());
+                settype($dataValue, $typeName);
             }
             $setValue->call($this, $dataValue);
 
             return;
         }
-        if ($propertyType->getName() === 'array') { // is array
+        if ($typeName === 'array') { // is array
             $setValue->call($this, array_merge((array) $value, (array) $dataValue));
 
             return;
         }
-        if (is_subclass_of($propertyType->getName(), MergeArrayInterface::class)) {
+        if (is_null($typeName) || is_subclass_of($typeName, MergeArrayInterface::class)) {
             if (!$value instanceof MergeArrayInterface) {
                 throw new MergeArrayException(sprintf('Unable to merge \'%s\' property \'%s\' which is not object', MergeArrayInterface::class, $property));
             }
