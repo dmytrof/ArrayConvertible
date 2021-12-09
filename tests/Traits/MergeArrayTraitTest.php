@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
 
 class MergeArrayTraitTest extends TestCase
 {
-    public function testConvertToArrayValue(): void
+    public function testMergeArray(): void
     {
         $object = new class implements MergeArrayInterface
         {
@@ -55,27 +55,50 @@ class MergeArrayTraitTest extends TestCase
             ],
         ], $object->getAllVars());
 
-
-        $object = new class implements MergeArrayInterface
+        $nestedObject = new class implements MergeArrayInterface
         {
             use MergeArrayTrait;
 
-            private const MERGE_ARRAY_NOT_SUPPORTED_PROPERTIES = ['notConvertibleProperty'];
+            private const ARRAY_NOT_CONVERTIBLE_PROPERTIES = ['notConvertibleProperty'];
 
-            public $foo = 1;
-            protected $bar = 'bar';
-            private $baz = [
-                'hello' => 'world',
-                4,
-                null,
-            ];
-            private $notConvertibleProperty; // Must be avoided in mergeArray
+            public int $nested1 = 1;
+            protected string $nested2 = 'bar';
+            private ?string $nested3 = null;
+            private string $notConvertibleProperty = 'qwe'; // Must be avoided in mergeArray and toArray
 
             public function __construct()
             {
                 $this->closure = function() {
                     return 55;
                 };
+            }
+
+            public function getAllVars(): array
+            {
+                return get_object_vars($this);
+            }
+        };
+
+
+        $object = new class ($nestedObject) implements MergeArrayInterface
+        {
+            use MergeArrayTrait;
+
+            private const MERGE_ARRAY_NOT_SUPPORTED_PROPERTIES = ['notConvertibleProperty'];
+
+            public int $foo = 1;
+            protected ?string $bar = 'bar';
+            private array $baz = [
+                'hello' => 'world',
+                4,
+                null,
+            ];
+            private bool $notConvertibleProperty = false; // Must be avoided in mergeArray
+            private $nestedObject;
+
+            public function __construct($nestedObject)
+            {
+                $this->nestedObject = $nestedObject;
             }
 
             public function getAllVars(): array
@@ -92,7 +115,13 @@ class MergeArrayTraitTest extends TestCase
                 'hello' => 'mello',
                 'woo' => 'hoo',
             ],
-            'notConvertibleProperty' => 'not usable'
+            'notConvertibleProperty' => 'not usable',
+            'nestedObject' => [
+                'nested1' => 11,
+                'nested2' => 22,
+                'nested3' => 33,
+                'notConvertibleProperty' => '44',
+            ],
         ]);
 
         $this->assertEquals([
@@ -103,47 +132,14 @@ class MergeArrayTraitTest extends TestCase
                 'test' => 'pest',
                 'woo' => 'hoo',
             ],
-            'notConvertibleProperty' => null
+            'notConvertibleProperty' => false,
+            'nestedObject' => [
+                'nested1' => 11,
+                'nested2' => '22',
+                'nested3' => '33',
+            ],
         ], $object->getAllVars());
     }
-
-//    public function testConvertToArrayData(): void
-//    {
-//        $object = new class implements ToArrayConvertibleInterface
-//        {
-//            use ToArrayConvertibleTrait {
-//                convertToArrayData AS public;
-//            }
-//            public $foo = 1;
-//            protected $bar = 'bar';
-//            private $baz = [
-//                'hello' => 'world',
-//                4,
-//                null,
-//            ];
-//        };
-//
-//        $this->assertEquals([], $object->convertToArrayData([]));
-//        $this->assertEquals([[]], $object->convertToArrayData([[]]));
-//        $this->assertEquals(['test' => 'test'], $object->convertToArrayData(['test' => 'test']));
-//        $this->assertEquals([1,3,5], $object->convertToArrayData([1,3,5]));
-//        $this->assertEquals(['foo' => 'bar', 3, null], $object->convertToArrayData(['foo' => 'bar', 3, null]));
-//        $this->assertEquals(['foo' => 'bar', 3, [['baz' => true]]], $object->convertToArrayData(['foo' => 'bar', 3, [['baz' => true]]]));
-//        $this->assertEquals([
-//            'foo' => 'bar',
-//            3,
-//            null,
-//            'object' => [
-//                'foo' => 1,
-//                'bar' => 'bar',
-//                'baz' => [
-//                    'hello' => 'world',
-//                    4,
-//                    null,
-//                ],
-//            ],
-//        ], $object->convertToArrayData(['foo' => 'bar', 3, null, 'object' => $object]));
-//    }
 //
 //    public function testGetNotArrayConvertibleProperties(): void
 //    {
@@ -176,130 +172,5 @@ class MergeArrayTraitTest extends TestCase
 //        $this->assertEquals(['test'], $object1->getToArrayNotConvertibleProperties());
 //        $this->assertEquals(['foo', 'bar'], $object2->getToArrayNotConvertibleProperties());
 //    }
-//
-//    public function testToArray(): void
-//    {
-//        $objectWithoutConst = new class implements ToArrayConvertibleInterface
-//        {
-//            use ToArrayConvertibleTrait;
-//
-//            public $foo = 1;
-//            protected $bar = 'bar';
-//            private $baz = [
-//                'hello' => 'world',
-//                4,
-//                null,
-//            ];
-//        };
-//
-//        $object1 = new class implements ToArrayConvertibleInterface
-//        {
-//            use ToArrayConvertibleTrait;
-//
-//            protected const TO_ARRAY_NOT_CONVERTIBLE_PROPERTIES = 'foo';
-//
-//            public $foo = 1;
-//            protected $bar = 'bar';
-//            private $baz = [
-//                'hello' => 'world',
-//                4,
-//                null,
-//            ];
-//        };
-//
-//        $object2 = new class ($objectWithoutConst, $object1) implements ToArrayConvertibleInterface
-//        {
-//            use ToArrayConvertibleTrait;
-//
-//            protected const TO_ARRAY_NOT_CONVERTIBLE_PROPERTIES = ['foo', 'bar'];
-//
-//            public $foo = 1;
-//            protected $bar = 'bar';
-//            protected $objectWithoutConst;
-//            private $baz = [
-//                'hello' => 'world',
-//                4,
-//                null,
-//            ];
-//            private $object1;
-//
-//            public function __construct($objectWithoutConst, $object1)
-//            {
-//                $this->objectWithoutConst = $objectWithoutConst;
-//                $this->object1 = $object1;
-//            }
-//        };
-//
-//        $object3 = new class ($objectWithoutConst, $object1) implements ToArrayConvertibleInterface
-//        {
-//            use ToArrayConvertibleTrait;
-//
-//            protected const TO_ARRAY_NOT_CONVERTIBLE_PROPERTIES = ['foo', 'bar'];
-//
-//            public $foo = 1;
-//            protected $bar = 'bar';
-//            protected $objectWithoutConst;
-//            private $baz = [
-//                'hello' => 'world',
-//                4,
-//                null,
-//            ];
-//            private $object1;
-//            private $stdClass;
-//
-//            public function __construct($objectWithoutConst, $object1)
-//            {
-//                $this->objectWithoutConst = $objectWithoutConst;
-//                $this->object1 = $object1;
-//                $this->stdClass = new \stdClass();
-//            }
-//        };
-//
-//        $this->assertEquals([
-//            'foo' => 1,
-//            'bar' => 'bar',
-//            'baz' => [
-//                'hello' => 'world',
-//                4,
-//                null,
-//            ],
-//        ], $objectWithoutConst->toArray());
-//
-//        $this->assertEquals([
-//            'bar' => 'bar',
-//            'baz' => [
-//                'hello' => 'world',
-//                4,
-//                null,
-//            ],
-//        ], $object1->toArray());
-//
-//        $this->assertEquals([
-//            'baz' => [
-//                'hello' => 'world',
-//                4,
-//                null,
-//            ],
-//            'objectWithoutConst' => [
-//                'foo' => 1,
-//                'bar' => 'bar',
-//                'baz' => [
-//                    'hello' => 'world',
-//                    4,
-//                    null,
-//                ],
-//            ],
-//            'object1' => [
-//                'bar' => 'bar',
-//                'baz' => [
-//                    'hello' => 'world',
-//                    4,
-//                    null,
-//                ],
-//            ],
-//        ], $object2->toArray());
-//
-//        $this->expectException(ToArrayConvertibleException::class);
-//        $object3->toArray();
-//    }
+
 }
