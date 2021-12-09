@@ -11,10 +11,10 @@
 
 namespace Dmytrof\ArrayConvertible\Traits;
 
-use Dmytrof\ArrayConvertible\Exception\FromArrayConvertibleException;
-use Dmytrof\ArrayConvertible\FromArrayConvertibleInterface;
+use Dmytrof\ArrayConvertible\Exception\MergeArrayException;
+use Dmytrof\ArrayConvertible\MergeArrayInterface;
 
-trait FromArrayConvertibleTrait
+trait MergeArrayTrait
 {
     /**
      * Merges object with array data
@@ -22,18 +22,18 @@ trait FromArrayConvertibleTrait
      *
      * @return void
      */
-    public function fromArray(array $data): void
+    public function mergeArray(array $data): void
     {
-        $this->convertFromArrayData(array_diff_key(get_object_vars($this), array_fill_keys($this->getFromArrayNotConvertibleProperties(), true)), $data);
+        $this->mergeArrayData(array_diff_key(get_object_vars($this), array_fill_keys($this->getMergeArrayNotSupportedProperties(), true)), $data);
     }
 
     /**
-     * Sets from array value
+     * Merges value from array value
      * @param string $property
      * @param $value
      * @param $dataValue
      */
-    protected function convertFromArrayValue(string $property, $value, $dataValue): void
+    protected function mergeArrayValue(string $property, $value, $dataValue): void
     {
         $method = 'set'.ucfirst($property);
         $setValue = function ($dataValue) use ($property, $method) {
@@ -47,7 +47,7 @@ trait FromArrayConvertibleTrait
         try {
             $propertyType = (new \ReflectionProperty($this, $property))->getType();
         } catch (\ReflectionException $e) {
-            throw new FromArrayConvertibleException(sprintf('Unable to set \'%s\' property: %s', $property, $e->getMessage()));
+            throw new MergeArrayException(sprintf('Unable to set \'%s\' property: %s', $property, $e->getMessage()));
         }
 
         if (in_array($propertyType->getName(), ['string', 'int', 'float', 'bool'], true)) { // is scalar
@@ -63,40 +63,40 @@ trait FromArrayConvertibleTrait
 
             return;
         }
-        if (is_subclass_of($propertyType->getName(), FromArrayConvertibleInterface::class)) {
-            if (!$value instanceof FromArrayConvertibleInterface) {
-                throw new FromArrayConvertibleException(sprintf('Unable to set from array \'%s\' property \'%s\' which is not object', FromArrayConvertibleInterface::class, $property));
+        if (is_subclass_of($propertyType->getName(), MergeArrayInterface::class)) {
+            if (!$value instanceof MergeArrayInterface) {
+                throw new MergeArrayException(sprintf('Unable to merge \'%s\' property \'%s\' which is not object', MergeArrayInterface::class, $property));
             }
-            $value->fromArray($dataValue);
+            $value->mergeArray($dataValue);
 
             return;
         }
 
-        throw new FromArrayConvertibleException(sprintf('Unsupported array convertible type \'%s\'', $propertyType->getName()));
+        throw new MergeArrayException(sprintf('Unsupported merge array type \'%s\'', $propertyType->getName()));
     }
 
     /**
-     * Converts from array data
-     * @param $properties
+     * Merges data from array
+     * @param array $properties
      * @param array $data
      */
-    protected function convertFromArrayData($properties, array $data): void
+    protected function mergeArrayData(array $properties, array $data): void
     {
         foreach ($properties as $property => $value) {
             if (!array_key_exists($property, $data)) {
                 continue;
             }
-            $this->convertFromArrayValue($property, $value, $data[$property]);
+            $this->mergeArrayValue($property, $value, $data[$property]);
         }
     }
 
     /**
-     * Returns not convertible properties
+     * Returns not supported properties
      * @return array|string[]
      */
-    protected function getFromArrayNotConvertibleProperties(): array
+    protected function getMergeArrayNotSupportedProperties(): array
     {
-        foreach (['FROM_ARRAY_NOT_CONVERTIBLE_PROPERTIES', 'ARRAY_NOT_CONVERTIBLE_PROPERTIES'] as $constant) {
+        foreach (['MERGE_ARRAY_NOT_SUPPORTED_PROPERTIES', 'ARRAY_NOT_CONVERTIBLE_PROPERTIES'] as $constant) {
             try {
                 return (array) (new \ReflectionClassConstant(static::class, $constant))->getValue();
             } catch (\ReflectionException $e) {

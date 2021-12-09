@@ -9,8 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Dmytrof\ArrayConvertible\Exception;
+namespace Dmytrof\ArrayConvertible;
 
-class FromArrayConvertibleException extends ArrayConvertibleException
+interface MergeArrayInterface
 {
+    /**
+     * Merges array data to object
+     * @param array $data
+     */
+    public function mergeArray(array $data): void;
 }

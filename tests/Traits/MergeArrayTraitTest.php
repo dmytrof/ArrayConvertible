@@ -11,17 +11,17 @@
 
 namespace Dmytrof\ArrayConvertible\Tests\Traits;
 
-use Dmytrof\ArrayConvertible\FromArrayConvertibleInterface;
-use Dmytrof\ArrayConvertible\Traits\FromArrayConvertibleTrait;
+use Dmytrof\ArrayConvertible\MergeArrayInterface;
+use Dmytrof\ArrayConvertible\Traits\MergeArrayTrait;
 use PHPUnit\Framework\TestCase;
 
-class FromArrayConvertibleTraitTest extends TestCase
+class MergeArrayTraitTest extends TestCase
 {
     public function testConvertToArrayValue(): void
     {
-        $object = new class implements FromArrayConvertibleInterface
+        $object = new class implements MergeArrayInterface
         {
-            use FromArrayConvertibleTrait ;
+            use MergeArrayTrait ;
 
             public int $foo = 1;
             protected ?string $bar = 'bar';
@@ -36,7 +36,7 @@ class FromArrayConvertibleTraitTest extends TestCase
             }
         };
 
-        $object->fromArray([
+        $object->mergeArray([
             'foo' => '12',
             'bar' => null,
             'baz' => [
