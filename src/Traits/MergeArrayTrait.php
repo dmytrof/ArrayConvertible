@@ -58,6 +58,14 @@ trait MergeArrayTrait
 
             return;
         }
+        if (is_subclass_of($typeName, \DateTimeInterface::class, true) || is_a($typeName, \DateTimeInterface::class, true)) { // date time
+            if (!(is_null($dataValue) && $propertyType->allowsNull())) {
+                $dataValue = $this->mergeArrayCreateDateTimeObject($property, $value, $dataValue, $typeName);
+            }
+            $setValue->call($this, $dataValue);
+
+            return;
+        }
         if ($typeName === 'array') { // is array
             $setValue->call($this, array_merge((array) $value, (array) $dataValue));
 
@@ -73,6 +81,22 @@ trait MergeArrayTrait
         }
 
         throw new MergeArrayException(sprintf('Unsupported merge array type \'%s\'', $propertyType->getName()));
+    }
+
+    /**
+     * Creates date time object
+     * @param string $property
+     * @param $value
+     * @param $dataValue
+     * @param string|null $typeName
+     *
+     * @return \DateTime|mixed
+     */
+    protected function mergeArrayCreateDateTimeObject(string $property, $value, $dataValue, ?string $typeName): ?\DateTimeInterface
+    {
+        $dateTimeClass = $typeName === \DateTimeInterface::class ? \DateTime::class : $typeName;
+
+        return new $dateTimeClass($dataValue);
     }
 
     /**

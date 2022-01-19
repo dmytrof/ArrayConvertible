@@ -24,14 +24,31 @@ class ToArrayConvertibleTraitTest extends TestCase
         {
             use ToArrayConvertibleTrait {
                 convertToArrayValue AS public;
+                convertToArrayDateTime AS _convertToArrayDateTime;
             }
             public int $foo = 1;
             protected ?string $bar = 'bar';
+            protected ?\DateTimeInterface $nullDate = null;
+            protected \DateTimeInterface $date;
+            protected \DateTimeImmutable $immutableDate;
             private array $baz = [
                 'hello' => 'world',
                 4,
                 null,
             ];
+            public function __construct()
+            {
+                $this->date = new \DateTime('2022-01-22T22:22:22+00:00');
+                $this->immutableDate = new \DateTimeImmutable('2021-01-01T00:00:00+00:00');
+            }
+            protected function convertToArrayDateTime(\DateTimeInterface $value, string $property = null): string
+            {
+                if ($property === 'date') {
+                    return $value->format('Y-m-d');
+                }
+
+                return $this->_convertToArrayDateTime($value, $property);
+            }
         };
 
         $this->assertEquals(null, $object->convertToArrayValue(null));
@@ -39,12 +56,17 @@ class ToArrayConvertibleTraitTest extends TestCase
         $this->assertEquals('foo', $object->convertToArrayValue('foo'));
         $this->assertEquals(5, $object->convertToArrayValue(5));
         $this->assertEquals(3.14, $object->convertToArrayValue(3.14));
+        $this->assertEquals('2022-01-22T22:22:22+00:00', $object->convertToArrayValue(new \DateTime('2022-01-22T22:22:22+00:00')));
+        $this->assertEquals('2021-01-01T00:00:00+00:00', $object->convertToArrayValue(new \DateTimeImmutable('2021-01-01T00:00:00+00:00')));
         $this->assertEquals([1,3,5], $object->convertToArrayValue([1,3,5]));
         $this->assertEquals(['foo' => 'bar', 3, null], $object->convertToArrayValue(['foo' => 'bar', 3, null]));
         $this->assertEquals(['foo' => 'bar', 3, [['baz' => true]]], $object->convertToArrayValue(['foo' => 'bar', 3, [['baz' => true]]]));
         $this->assertEquals([
             'foo' => 1,
             'bar' => 'bar',
+            'nullDate' => null,
+            'date' => '2022-01-22',
+            'immutableDate' => '2021-01-01T00:00:00+00:00',
             'baz' => [
                 'hello' => 'world',
                 4,

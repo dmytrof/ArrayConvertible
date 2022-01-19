@@ -23,18 +23,35 @@ class MergeArrayTraitTest extends TestCase
     {
         $object = new class implements MergeArrayInterface
         {
-            use MergeArrayTrait ;
+            use MergeArrayTrait {
+                mergeArrayCreateDateTimeObject AS _mergeArrayCreateDateTimeObject;
+            }
 
             public int $foo = 1;
             protected ?string $bar = 'bar';
+            protected ?\DateTimeInterface $nullDate = null;
+            protected \DateTimeInterface $date;
+            protected \DateTimeImmutable $immutableDate;
             private array $baz = [
                 'hello' => 'world',
                 'test' => 'pest',
             ];
-
+            public function __construct()
+            {
+                $this->date = new \DateTime('2022-01-22T22:22:22+00:00');
+                $this->immutableDate = new \DateTimeImmutable('2021-01-01T00:00:00+00:00');
+            }
             public function getAllVars(): array
             {
                 return get_object_vars($this);
+            }
+            protected function mergeArrayCreateDateTimeObject(string $property, $value, $dataValue, ?string $typeName): ?\DateTimeInterface
+            {
+                if ($property === 'immutableDate') {
+                    return new \DateTimeImmutable($dataValue);
+                }
+
+                return $this->_mergeArrayCreateDateTimeObject($property, $value, $dataValue, $typeName);
             }
         };
 
@@ -50,6 +67,28 @@ class MergeArrayTraitTest extends TestCase
         $this->assertEquals([
             'foo' => 12,
             'bar' => null,
+            'nullDate' => null,
+            'date' => new \DateTime('2022-01-22T22:22:22+00:00'),
+            'immutableDate' => new \DateTimeImmutable('2021-01-01T00:00:00+00:00'),
+            'baz' => [
+                'hello' => 'mello',
+                'test' => 'pest',
+                'woo' => 'hoo',
+            ],
+        ], $object->getAllVars());
+
+        $object->mergeArray([
+            'nullDate' => null,
+            'date' => '2000-01-22',
+            'immutableDate' => '2022-01-01T01:01:01+03:00',
+        ]);
+
+        $this->assertEquals([
+            'foo' => 12,
+            'bar' => null,
+            'nullDate' => null,
+            'date' => new \DateTime('2000-01-22'),
+            'immutableDate' => new \DateTimeImmutable('2022-01-01T01:01:01+03:00'),
             'baz' => [
                 'hello' => 'mello',
                 'test' => 'pest',

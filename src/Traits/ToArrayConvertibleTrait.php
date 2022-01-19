@@ -28,10 +28,11 @@ trait ToArrayConvertibleTrait
     /**
      * Returns converted value
      * @param $value
+     * @param string|null $property
      *
      * @return array|bool|float|int|string|null
      */
-    protected function convertToArrayValue($value)
+    protected function convertToArrayValue($value, string $property = null)
     {
         if (is_scalar($value)) {
             return $value;
@@ -40,26 +41,42 @@ trait ToArrayConvertibleTrait
             return null;
         }
         if (is_array($value)) {
-            return $this->convertToArrayData($value);
+            return $this->convertToArrayData($value, $property);
+        }
+        if ($value instanceof \DateTimeInterface) {
+            return $this->convertToArrayDateTime($value, $property);
         }
         if ($value instanceof ToArrayConvertibleInterface) {
             return $value->toArray();
         }
 
-        throw new ToArrayConvertibleException(sprintf('Unsupported array convertible type \'%s\'', is_object($value) ? get_class($value) : gettype($value)));
+        throw new ToArrayConvertibleException(sprintf('Unsupported array convertible type \'%s\' for property \'%s\'', is_object($value) ? get_class($value) : gettype($value), $property));
+    }
+
+    /**
+     * Converts date time to string
+     * @param \DateTimeInterface $value
+     * @param string|null $property
+     *
+     * @return string
+     */
+    protected function convertToArrayDateTime(\DateTimeInterface $value, string $property = null): string
+    {
+        return $value->format(\DateTimeInterface::ATOM);
     }
 
     /**
      * Converts array data to array
      * @param array $data
+     * @param string|null $property
      *
      * @return array
      */
-    protected function convertToArrayData(array $data): array
+    protected function convertToArrayData(array $data, ?string $property = null): array
     {
         $array = [];
-        foreach ($data as $property => $value) {
-            $array[$property] = $this->convertToArrayValue($value);
+        foreach ($data as $prop => $value) {
+            $array[$prop] = $this->convertToArrayValue($value, ltrim($property.'.'.$prop, '.'));
         }
 
         return $array;
