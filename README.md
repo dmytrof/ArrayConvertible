@@ -125,10 +125,10 @@ To convert properties of unsupported types extend method `convertToArrayValue`.
             };
         }
 
-        public function convertToArrayValue($value)
+        public function convertToArrayValue($value, string $property = null)
         {
             try {
-                return $this->__convertToArrayValue($value);
+                return $this->__convertToArrayValue($value, $property);
             } catch (ToArrayConvertibleException $e) {
                 if ($value instanceof \Closure) {
                     return $value->call($this);
