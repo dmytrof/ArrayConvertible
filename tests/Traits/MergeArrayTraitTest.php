@@ -72,7 +72,6 @@ class MergeArrayTraitTest extends TestCase
             'immutableDate' => new \DateTimeImmutable('2021-01-01T00:00:00+00:00'),
             'baz' => [
                 'hello' => 'mello',
-                'test' => 'pest',
                 'woo' => 'hoo',
             ],
         ], $object->getAllVars());
@@ -91,7 +90,6 @@ class MergeArrayTraitTest extends TestCase
             'immutableDate' => new \DateTimeImmutable('2022-01-01T01:01:01+03:00'),
             'baz' => [
                 'hello' => 'mello',
-                'test' => 'pest',
                 'woo' => 'hoo',
             ],
         ], $object->getAllVars());
@@ -156,7 +154,6 @@ class MergeArrayTraitTest extends TestCase
             'bar' => null,
             'baz' => [
                 'hello' => 'mello',
-                'test' => 'pest',
                 'woo' => 'hoo',
             ],
             'notConvertibleProperty' => false,

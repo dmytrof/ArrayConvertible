@@ -50,7 +50,7 @@ trait MergeArrayTrait
         }
 
         $typeName = $propertyType ? $propertyType->getName() : null;
-        if (in_array($typeName, ['string', 'int', 'float', 'bool'], true)) { // is scalar
+        if (in_array($typeName, ['string', 'int', 'float', 'bool', 'array'], true)) { // is scalar or array
             if (!(is_null($dataValue) && $propertyType->allowsNull())) {
                 settype($dataValue, $typeName);
             }
@@ -63,11 +63,6 @@ trait MergeArrayTrait
                 $dataValue = $this->mergeArrayCreateDateTimeObject($property, $value, $dataValue, $typeName);
             }
             $setValue->call($this, $dataValue);
-
-            return;
-        }
-        if ($typeName === 'array') { // is array
-            $setValue->call($this, array_merge((array) $value, (array) $dataValue));
 
             return;
         }
