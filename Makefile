@@ -6,7 +6,7 @@ lint: phpcs-report psalm-no-cache
 
 .PHONY: psalm-no-cache
 psalm-no-cache:
-	$(PHP_COMMAND) ./vendor/bin/psalm --show-info=false --no-cache
+	$(PHP_COMMAND) ./vendor/bin/psalm --show-info=true --no-cache
 
 .PHONY: phpcs-report
 phpcs-report:

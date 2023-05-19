@@ -15,7 +15,7 @@ interface PrepareMergeArrayValueInterface
 {
     /**
      * Prepares merge array value to set to object
-     * @param $value
+     * @param scalar $value
      *
      * @return mixed
      */
