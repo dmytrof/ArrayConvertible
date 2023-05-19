@@ -12,6 +12,7 @@
 namespace Dmytrof\ArrayConvertible\Tests\Traits;
 
 use Dmytrof\ArrayConvertible\MergeArrayInterface;
+use Dmytrof\ArrayConvertible\PrepareMergeArrayValueInterface;
 use Dmytrof\ArrayConvertible\ToArrayConvertibleInterface;
 use Dmytrof\ArrayConvertible\Traits\MergeArrayTrait;
 use Dmytrof\ArrayConvertible\Traits\ToArrayConvertibleTrait;
@@ -21,7 +22,24 @@ class MergeArrayTraitTest extends TestCase
 {
     public function testMergeArray(): void
     {
-        $object = new class implements MergeArrayInterface
+        $objectWithPrepareMergeArrayValue = new class implements PrepareMergeArrayValueInterface
+        {
+            public string $value = '123';
+            public function prepareMergeArrayValue($value)
+            {
+                $v = new self();
+                $v->value = $value;
+
+                return $v;
+            }
+            public function setValue(string $value)
+            {
+                $this->value = $value;
+
+                return $this;
+            }
+        };
+        $object = new class ($objectWithPrepareMergeArrayValue) implements MergeArrayInterface
         {
             use MergeArrayTrait {
                 mergeArrayCreateDateTimeObject AS _mergeArrayCreateDateTimeObject;
@@ -32,14 +50,16 @@ class MergeArrayTraitTest extends TestCase
             protected ?\DateTimeInterface $nullDate = null;
             protected \DateTimeInterface $date;
             protected \DateTimeImmutable $immutableDate;
+            protected PrepareMergeArrayValueInterface $prepareMergeArrayValue;
             private array $baz = [
                 'hello' => 'world',
                 'test' => 'pest',
             ];
-            public function __construct()
+            public function __construct(PrepareMergeArrayValueInterface $prepareMergeArrayValue)
             {
                 $this->date = new \DateTime('2022-01-22T22:22:22+00:00');
                 $this->immutableDate = new \DateTimeImmutable('2021-01-01T00:00:00+00:00');
+                $this->prepareMergeArrayValue = $prepareMergeArrayValue;
             }
             public function getAllVars(): array
             {
@@ -70,6 +90,7 @@ class MergeArrayTraitTest extends TestCase
             'nullDate' => null,
             'date' => new \DateTime('2022-01-22T22:22:22+00:00'),
             'immutableDate' => new \DateTimeImmutable('2021-01-01T00:00:00+00:00'),
+            'prepareMergeArrayValue' => $objectWithPrepareMergeArrayValue,
             'baz' => [
                 'hello' => 'mello',
                 'woo' => 'hoo',
@@ -80,6 +101,7 @@ class MergeArrayTraitTest extends TestCase
             'nullDate' => null,
             'date' => '2000-01-22',
             'immutableDate' => '2022-01-01T01:01:01+03:00',
+            'prepareMergeArrayValue' => 'qwerty',
         ]);
 
         $this->assertEquals([
@@ -88,6 +110,7 @@ class MergeArrayTraitTest extends TestCase
             'nullDate' => null,
             'date' => new \DateTime('2000-01-22'),
             'immutableDate' => new \DateTimeImmutable('2022-01-01T01:01:01+03:00'),
+            'prepareMergeArrayValue' => (clone $objectWithPrepareMergeArrayValue)->setValue('qwerty'),
             'baz' => [
                 'hello' => 'mello',
                 'woo' => 'hoo',

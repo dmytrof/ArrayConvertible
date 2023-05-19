@@ -13,6 +13,7 @@ namespace Dmytrof\ArrayConvertible\Traits;
 
 use Dmytrof\ArrayConvertible\Exception\MergeArrayException;
 use Dmytrof\ArrayConvertible\MergeArrayInterface;
+use Dmytrof\ArrayConvertible\PrepareMergeArrayValueInterface;
 
 trait MergeArrayTrait
 {
@@ -24,7 +25,10 @@ trait MergeArrayTrait
      */
     public function mergeArray(array $data): void
     {
-        $this->mergeArrayData(array_diff_key(get_object_vars($this), array_fill_keys($this->getMergeArrayNotSupportedProperties(), true)), $data);
+        $this->mergeArrayData(array_diff_key(
+            get_object_vars($this),
+            array_fill_keys($this->getMergeArrayNotSupportedProperties(), true),
+        ), $data);
     }
 
     /**
@@ -35,7 +39,7 @@ trait MergeArrayTrait
      */
     protected function mergeArrayValue(string $property, $value, $dataValue): void
     {
-        $method = 'set'.ucfirst($property);
+        $method = 'set' . ucfirst($property);
         $setValue = function ($dataValue) use ($property, $method) {
             if (method_exists($this, $method)) {
                 $this->$method($dataValue);
@@ -58,7 +62,7 @@ trait MergeArrayTrait
 
             return;
         }
-        if (is_subclass_of($typeName, \DateTimeInterface::class, true) || is_a($typeName, \DateTimeInterface::class, true)) { // date time
+        if (is_a($typeName, \DateTimeInterface::class, true)) { // date time
             if (!(is_null($dataValue) && $propertyType->allowsNull())) {
                 $dataValue = $this->mergeArrayCreateDateTimeObject($property, $value, $dataValue, $typeName);
             }
@@ -66,16 +70,35 @@ trait MergeArrayTrait
 
             return;
         }
-        if (is_null($typeName) || is_subclass_of($typeName, MergeArrayInterface::class)) {
+        if (is_a($typeName, PrepareMergeArrayValueInterface::class, true)) {
+            if (!$value instanceof PrepareMergeArrayValueInterface) {
+                throw new MergeArrayException(sprintf(
+                    'Unable to prepare value for \'%s\' property \'%s\' which is not object',
+                    PrepareMergeArrayValueInterface::class,
+                    $property,
+                ));
+            }
+            $setValue->call($this, $value->prepareMergeArrayValue($dataValue));
+
+            return;
+        }
+        if (is_null($typeName) || is_a($typeName, MergeArrayInterface::class, true)) {
             if (!$value instanceof MergeArrayInterface) {
-                throw new MergeArrayException(sprintf('Unable to merge \'%s\' property \'%s\' which is not object', MergeArrayInterface::class, $property));
+                throw new MergeArrayException(sprintf(
+                    'Unable to merge \'%s\' property \'%s\' which is not object',
+                    MergeArrayInterface::class,
+                    $property,
+                ));
             }
             $value->mergeArray($dataValue);
 
             return;
         }
 
-        throw new MergeArrayException(sprintf('Unsupported merge array type \'%s\'', $propertyType->getName()));
+        throw new MergeArrayException(sprintf(
+            'Unsupported merge array type \'%s\'',
+            $propertyType->getName(),
+        ));
     }
 
     /**
@@ -87,8 +110,12 @@ trait MergeArrayTrait
      *
      * @return \DateTime|mixed
      */
-    protected function mergeArrayCreateDateTimeObject(string $property, $value, $dataValue, ?string $typeName): ?\DateTimeInterface
-    {
+    protected function mergeArrayCreateDateTimeObject(
+        string $property,
+        $value,
+        $dataValue,
+        ?string $typeName
+    ): ?\DateTimeInterface {
         $dateTimeClass = $typeName === \DateTimeInterface::class ? \DateTime::class : $typeName;
 
         return new $dateTimeClass($dataValue);

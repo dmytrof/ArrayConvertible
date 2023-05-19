@@ -13,6 +13,7 @@ namespace Dmytrof\ArrayConvertible\Traits;
 
 use Dmytrof\ArrayConvertible\ToArrayConvertibleInterface;
 use Dmytrof\ArrayConvertible\Exception\ToArrayConvertibleException;
+use Dmytrof\ArrayConvertible\ToArrayValueConvertibleInterface;
 
 trait ToArrayConvertibleTrait
 {
@@ -22,7 +23,10 @@ trait ToArrayConvertibleTrait
      */
     public function toArray(): array
     {
-        return $this->convertToArrayData(array_diff_key(get_object_vars($this), array_fill_keys($this->getToArrayNotConvertibleProperties(), true)));
+        return $this->convertToArrayData(array_diff_key(
+            get_object_vars($this),
+            array_fill_keys($this->getToArrayNotConvertibleProperties(), true),
+        ));
     }
 
     /**
@@ -49,8 +53,15 @@ trait ToArrayConvertibleTrait
         if ($value instanceof ToArrayConvertibleInterface) {
             return $value->toArray();
         }
+        if ($value instanceof ToArrayValueConvertibleInterface) {
+            return $value->toArrayValue();
+        }
 
-        throw new ToArrayConvertibleException(sprintf('Unsupported array convertible type \'%s\' for property \'%s\'', is_object($value) ? get_class($value) : gettype($value), $property));
+        throw new ToArrayConvertibleException(sprintf(
+            'Unsupported array convertible type \'%s\' for property \'%s\'',
+            is_object($value) ? get_class($value) : gettype($value),
+            $property,
+        ));
     }
 
     /**
@@ -76,7 +87,7 @@ trait ToArrayConvertibleTrait
     {
         $array = [];
         foreach ($data as $prop => $value) {
-            $array[$prop] = $this->convertToArrayValue($value, ltrim($property.'.'.$prop, '.'));
+            $array[$prop] = $this->convertToArrayValue($value, ltrim($property . '.' . $prop, '.'));
         }
 
         return $array;

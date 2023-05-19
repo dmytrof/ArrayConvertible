@@ -13,6 +13,7 @@ namespace Dmytrof\ArrayConvertible\Tests\Traits;
 
 use Dmytrof\ArrayConvertible\ToArrayConvertibleInterface;
 use Dmytrof\ArrayConvertible\Exception\ToArrayConvertibleException;
+use Dmytrof\ArrayConvertible\ToArrayValueConvertibleInterface;
 use Dmytrof\ArrayConvertible\Traits\ToArrayConvertibleTrait;
 use PHPUnit\Framework\TestCase;
 
@@ -31,6 +32,7 @@ class ToArrayConvertibleTraitTest extends TestCase
             protected ?\DateTimeInterface $nullDate = null;
             protected \DateTimeInterface $date;
             protected \DateTimeImmutable $immutableDate;
+            protected ToArrayValueConvertibleInterface $toArrayValueConvertible;
             private array $baz = [
                 'hello' => 'world',
                 4,
@@ -40,6 +42,13 @@ class ToArrayConvertibleTraitTest extends TestCase
             {
                 $this->date = new \DateTime('2022-01-22T22:22:22+00:00');
                 $this->immutableDate = new \DateTimeImmutable('2021-01-01T00:00:00+00:00');
+                $this->toArrayValueConvertible = new class implements ToArrayValueConvertibleInterface
+                {
+                    public function toArrayValue()
+                    {
+                        return 'toArrayValue';
+                    }
+                };
             }
             protected function convertToArrayDateTime(\DateTimeInterface $value, string $property = null): string
             {
@@ -67,6 +76,7 @@ class ToArrayConvertibleTraitTest extends TestCase
             'nullDate' => null,
             'date' => '2022-01-22',
             'immutableDate' => '2021-01-01T00:00:00+00:00',
+            'toArrayValueConvertible' => 'toArrayValue',
             'baz' => [
                 'hello' => 'world',
                 4,
