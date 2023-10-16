@@ -29,20 +29,18 @@ trait EnumToArrayValueConvertibleTrait
 
     /**
      * Prepares merge array value to set to object
-     * @param scalar $value
+     * @param mixed $value
      *
      * @return mixed
      */
-    public function prepareMergeArrayValue(mixed $value): BackedEnum
+    public function prepareMergeArrayValue(mixed $value): mixed
     {
         $this->checkBackedEnum();
         if (!is_string($value) && !is_int($value)) {
             throw new ArrayConvertibleException(
                 sprintf(
                     'Unsupported value type %s for %s::from method',
-                    function_exists('get_debug_type')
-                        ? get_debug_type($value)
-                        : gettype($value),
+                    get_debug_type($value),
                     self::class,
                 )
             );

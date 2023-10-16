@@ -25,14 +25,14 @@ class MergeArrayTraitTest extends TestCase
         $objectWithPrepareMergeArrayValue = new class implements PrepareMergeArrayValueInterface
         {
             public string $value = '123';
-            public function prepareMergeArrayValue($value)
+            public function prepareMergeArrayValue(mixed $value): mixed
             {
                 $v = new self();
                 $v->value = $value;
 
                 return $v;
             }
-            public function setValue(string $value)
+            public function setValue(string $value): self
             {
                 $this->value = $value;
 
@@ -65,7 +65,7 @@ class MergeArrayTraitTest extends TestCase
             {
                 return get_object_vars($this);
             }
-            protected function mergeArrayCreateDateTimeObject(string $property, $value, $dataValue, ?string $typeName): ?\DateTimeInterface
+            protected function mergeArrayCreateDateTimeObject(string $property, mixed $value, mixed $dataValue, ?string $typeName): ?\DateTimeInterface
             {
                 if ($property === 'immutableDate') {
                     return new \DateTimeImmutable($dataValue);

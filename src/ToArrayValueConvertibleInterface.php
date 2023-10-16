@@ -17,5 +17,5 @@ interface ToArrayValueConvertibleInterface
      * Converts object to array value
      * @return mixed
      */
-    public function toArrayValue();
+    public function toArrayValue(): mixed;
 }

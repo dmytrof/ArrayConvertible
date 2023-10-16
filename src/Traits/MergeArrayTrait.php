@@ -34,10 +34,10 @@ trait MergeArrayTrait
     /**
      * Merges value from array value
      * @param string $property
-     * @param $value
-     * @param $dataValue
+     * @param mixed $value
+     * @param mixed $dataValue
      */
-    protected function mergeArrayValue(string $property, $value, $dataValue): void
+    protected function mergeArrayValue(string $property, mixed $value, mixed $dataValue): void
     {
         $method = 'set' . ucfirst($property);
         $setValue = function ($dataValue) use ($property, $method) {
@@ -50,7 +50,11 @@ trait MergeArrayTrait
         try {
             $propertyType = (new \ReflectionProperty($this, $property))->getType();
         } catch (\ReflectionException $e) {
-            throw new MergeArrayException(sprintf('Unable to set \'%s\' property: %s', $property, $e->getMessage()));
+            throw new MergeArrayException(sprintf(
+                'Unable to set \'%s\' property: %s',
+                $property,
+                $e->getMessage(),
+            ));
         }
 
         $typeName = $propertyType ? $propertyType->getName() : null;
@@ -104,16 +108,16 @@ trait MergeArrayTrait
     /**
      * Creates date time object
      * @param string $property
-     * @param $value
-     * @param $dataValue
+     * @param mixed $value
+     * @param mixed $dataValue
      * @param string|null $typeName
      *
      * @return \DateTime|mixed
      */
     protected function mergeArrayCreateDateTimeObject(
         string $property,
-        $value,
-        $dataValue,
+        mixed $value,
+        mixed $dataValue,
         ?string $typeName
     ): ?\DateTimeInterface {
         $dateTimeClass = $typeName === \DateTimeInterface::class ? \DateTime::class : $typeName;

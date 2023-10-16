@@ -44,7 +44,7 @@ class ToArrayConvertibleTraitTest extends TestCase
                 $this->immutableDate = new \DateTimeImmutable('2021-01-01T00:00:00+00:00');
                 $this->toArrayValueConvertible = new class implements ToArrayValueConvertibleInterface
                 {
-                    public function toArrayValue()
+                    public function toArrayValue(): mixed
                     {
                         return 'toArrayValue';
                     }
@@ -122,7 +122,7 @@ class ToArrayConvertibleTraitTest extends TestCase
                 };
             }
 
-            public function convertToArrayValue($value)
+            public function convertToArrayValue(mixed $value): mixed
             {
                 try {
                     return $this->__convertToArrayValue($value);
