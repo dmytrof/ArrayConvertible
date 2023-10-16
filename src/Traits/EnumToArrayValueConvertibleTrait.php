@@ -1,4 +1,14 @@
 <?php
+
+/*
+ * This file is part of the DmytrofArrayConvertible package.
+ *
+ * (c) Dmytro Feshchenko <dmytro.feshchenko@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Dmytrof\ArrayConvertible\Traits;
 
 use BackedEnum;
@@ -32,8 +42,7 @@ trait EnumToArrayValueConvertibleTrait
                     'Unsupported value type %s for %s::from method',
                     function_exists('get_debug_type')
                         ? get_debug_type($value)
-                        : gettype($value)
-                    ,
+                        : gettype($value),
                     self::class,
                 )
             );
@@ -61,4 +70,3 @@ trait EnumToArrayValueConvertibleTrait
         return true;
     }
 }
-
