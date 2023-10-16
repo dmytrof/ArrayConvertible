@@ -11,11 +11,8 @@
 
 namespace Dmytrof\ArrayConvertible;
 
-interface ToArrayValueConvertibleInterface
+interface EnumToArrayValueConvertibleInterface extends
+    ToArrayValueConvertibleInterface,
+    PrepareMergeArrayValueInterface
 {
-    /**
-     * Converts object to array value
-     * @return mixed
-     */
-    public function toArrayValue(): mixed;
 }

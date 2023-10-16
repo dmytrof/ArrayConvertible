@@ -31,12 +31,12 @@ trait ToArrayConvertibleTrait
 
     /**
      * Returns converted value
-     * @param $value
+     * @param mixed $value
      * @param string|null $property
      *
      * @return array|bool|float|int|string|null
      */
-    protected function convertToArrayValue($value, string $property = null)
+    protected function convertToArrayValue(mixed $value, string $property = null): mixed
     {
         if (is_scalar($value)) {
             return $value;

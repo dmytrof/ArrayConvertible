@@ -15,9 +15,9 @@ interface PrepareMergeArrayValueInterface
 {
     /**
      * Prepares merge array value to set to object
-     * @param scalar $value
+     * @param mixed $value
      *
      * @return mixed
      */
-    public function prepareMergeArrayValue($value);
+    public function prepareMergeArrayValue(mixed $value): mixed;
 }

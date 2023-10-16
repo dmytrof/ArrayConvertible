@@ -1,4 +1,3 @@
-EXCLUDED_RULES_SYMFONY = Symfony.Commenting.FunctionComment,Symfony.Commenting.ClassComment,Symfony.Commenting.License,Symfony.Functions.Arguments,Squiz.Strings.ConcatenationSpacing
 PHP_COMMAND=php
 
 .PHONY: lint
