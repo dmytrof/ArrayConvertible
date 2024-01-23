@@ -19,6 +19,12 @@
         "squizlabs/php_codesniffer": "^3.6",
         "vimeo/psalm": "^4.1"
     },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    },
     "autoload": {
         "psr-4": {
             "Dmytrof\\ArrayConvertible\\": "src/"
