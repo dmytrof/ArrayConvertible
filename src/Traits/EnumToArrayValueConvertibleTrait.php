@@ -32,13 +32,13 @@ trait EnumToArrayValueConvertibleTrait
     public function prepareMergeArrayValue(mixed $value): static
     {
         $this->checkBackedEnum();
-        if (!is_string($value) && !is_int($value)) {
+        if (!\is_string($value) && !\is_int($value)) {
             throw new ArrayConvertibleException(
-                sprintf(
+                \sprintf(
                     'Unsupported value type %s for %s::from method',
-                    get_debug_type($value),
+                    \get_debug_type($value),
                     self::class,
-                )
+                ),
             );
         }
 
@@ -52,11 +52,11 @@ trait EnumToArrayValueConvertibleTrait
     {
         if (!$this instanceof BackedEnum) {
             throw new ArrayConvertibleException(
-                sprintf(
+                \sprintf(
                     'Trait should be included to %s enum. Currently it is included to %s',
                     BackedEnum::class,
-                    get_debug_type($this),
-                )
+                    \get_debug_type($this),
+                ),
             );
         }
 

@@ -12,8 +12,8 @@
 namespace Dmytrof\ArrayConvertible\Traits;
 
 use DateTimeInterface;
-use Dmytrof\ArrayConvertible\ToArrayConvertibleInterface;
 use Dmytrof\ArrayConvertible\Exception\ToArrayConvertibleException;
+use Dmytrof\ArrayConvertible\ToArrayConvertibleInterface;
 use Dmytrof\ArrayConvertible\ToArrayValueConvertibleInterface;
 use ReflectionClassConstant;
 use ReflectionException;
@@ -25,9 +25,9 @@ trait ToArrayConvertibleTrait
      */
     public function toArray(): array
     {
-        return $this->convertToArrayData(array_diff_key(
-            get_object_vars($this),
-            array_fill_keys($this->getToArrayNotConvertibleProperties(), true),
+        return $this->convertToArrayData(\array_diff_key(
+            \get_object_vars($this),
+            \array_fill_keys($this->getToArrayNotConvertibleProperties(), true),
         ));
     }
 
@@ -36,16 +36,16 @@ trait ToArrayConvertibleTrait
      */
     protected function convertToArrayValue(mixed $value, ?string $property = null): mixed
     {
-        if (is_scalar($value)) {
+        if (\is_scalar($value)) {
             return $value;
         }
-        if (is_null($value)) {
+        if (\is_null($value)) {
             return null;
         }
-        if (is_array($value)) {
+        if (\is_array($value)) {
             return $this->convertToArrayData($value, $property);
         }
-        if ($value instanceof \DateTimeInterface) {
+        if ($value instanceof DateTimeInterface) {
             return $this->convertToArrayDateTime($value, $property);
         }
         if ($value instanceof ToArrayConvertibleInterface) {
@@ -55,9 +55,9 @@ trait ToArrayConvertibleTrait
             return $value->toArrayValue();
         }
 
-        throw new ToArrayConvertibleException(sprintf(
+        throw new ToArrayConvertibleException(\sprintf(
             'Unsupported array convertible type \'%s\' for property \'%s\'',
-            is_object($value) ? get_class($value) : gettype($value),
+            \is_object($value) ? \get_class($value) : \gettype($value),
             $property,
         ));
     }
@@ -77,7 +77,7 @@ trait ToArrayConvertibleTrait
     {
         $array = [];
         foreach ($data as $prop => $value) {
-            $array[$prop] = $this->convertToArrayValue($value, ltrim($property . '.' . $prop, '.'));
+            $array[$prop] = $this->convertToArrayValue($value, \ltrim($property . '.' . $prop, '.'));
         }
 
         return $array;
