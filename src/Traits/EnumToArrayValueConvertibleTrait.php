@@ -18,9 +18,8 @@ trait EnumToArrayValueConvertibleTrait
 {
     /**
      * Converts object to array value
-     * @return mixed
      */
-    public function toArrayValue(): mixed
+    public function toArrayValue(): int|string
     {
         $this->checkBackedEnum();
 
@@ -29,11 +28,8 @@ trait EnumToArrayValueConvertibleTrait
 
     /**
      * Prepares merge array value to set to object
-     * @param mixed $value
-     *
-     * @return mixed
      */
-    public function prepareMergeArrayValue(mixed $value): mixed
+    public function prepareMergeArrayValue(mixed $value): static
     {
         $this->checkBackedEnum();
         if (!is_string($value) && !is_int($value)) {
@@ -51,7 +47,6 @@ trait EnumToArrayValueConvertibleTrait
 
     /**
      * Checks backed enum
-     * @return bool
      */
     private function checkBackedEnum(): bool
     {

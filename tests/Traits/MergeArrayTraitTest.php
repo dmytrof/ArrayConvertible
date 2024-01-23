@@ -25,7 +25,7 @@ class MergeArrayTraitTest extends TestCase
         $objectWithPrepareMergeArrayValue = new class implements PrepareMergeArrayValueInterface
         {
             public string $value = '123';
-            public function prepareMergeArrayValue(mixed $value): mixed
+            public function prepareMergeArrayValue(mixed $value): static
             {
                 $v = new self();
                 $v->value = $value;
@@ -185,6 +185,81 @@ class MergeArrayTraitTest extends TestCase
                 'nested2' => '22',
                 'nested3' => '33',
             ],
+        ], $object->getAllVars());
+
+        $object = new class () implements MergeArrayInterface
+        {
+            use MergeArrayTrait;
+
+            private const MERGE_ARRAY_NOT_SUPPORTED_PROPERTIES = ['notConvertibleProperty'];
+
+            public int $foo = 1;
+            protected ?string $bar = 'bar';
+            private array $baz = [
+                'hello' => 'world',
+                'test' => 'pest',
+            ];
+            private bool $notConvertibleProperty = false; // Must be avoided in mergeArray
+            private $nestedObject; // any value
+
+            public function getAllVars(): array
+            {
+                return array_merge(get_object_vars($this));
+            }
+        };
+
+        $object->mergeArray([
+            'foo' => '12',
+            'bar' => null,
+            'baz' => [
+                'hello' => 'mello',
+                'woo' => 'hoo',
+            ],
+            'notConvertibleProperty' => 'not usable',
+            'nestedObject' => [
+                'nested1' => 11,
+                'nested2' => 22,
+                'nested3' => 33,
+                'notConvertibleProperty' => '44',
+            ],
+        ]);
+
+        $this->assertEquals([
+            'foo' => 12,
+            'bar' => null,
+            'baz' => [
+                'hello' => 'mello',
+                'woo' => 'hoo',
+            ],
+            'notConvertibleProperty' => false,
+            'nestedObject' => [
+                'nested1' => 11,
+                'nested2' => 22,
+                'nested3' => 33,
+                'notConvertibleProperty' => '44',
+            ],
+        ], $object->getAllVars());
+
+        $object->mergeArray([
+            'foo' => '12',
+            'bar' => null,
+            'baz' => [
+                'hello' => 'mello',
+                'woo' => 'hoo',
+            ],
+            'notConvertibleProperty' => 'not usable',
+            'nestedObject' => 'some string',
+        ]);
+
+        $this->assertEquals([
+            'foo' => 12,
+            'bar' => null,
+            'baz' => [
+                'hello' => 'mello',
+                'woo' => 'hoo',
+            ],
+            'notConvertibleProperty' => false,
+            'nestedObject' => 'some string',
         ], $object->getAllVars());
     }
 

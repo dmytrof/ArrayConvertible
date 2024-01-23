@@ -11,15 +11,17 @@
 
 namespace Dmytrof\ArrayConvertible\Traits;
 
+use DateTimeInterface;
 use Dmytrof\ArrayConvertible\ToArrayConvertibleInterface;
 use Dmytrof\ArrayConvertible\Exception\ToArrayConvertibleException;
 use Dmytrof\ArrayConvertible\ToArrayValueConvertibleInterface;
+use ReflectionClassConstant;
+use ReflectionException;
 
 trait ToArrayConvertibleTrait
 {
     /**
      * Converts object to array
-     * @return array
      */
     public function toArray(): array
     {
@@ -31,12 +33,8 @@ trait ToArrayConvertibleTrait
 
     /**
      * Returns converted value
-     * @param mixed $value
-     * @param string|null $property
-     *
-     * @return array|bool|float|int|string|null
      */
-    protected function convertToArrayValue(mixed $value, string $property = null): mixed
+    protected function convertToArrayValue(mixed $value, ?string $property = null): mixed
     {
         if (is_scalar($value)) {
             return $value;
@@ -66,22 +64,14 @@ trait ToArrayConvertibleTrait
 
     /**
      * Converts date time to string
-     * @param \DateTimeInterface $value
-     * @param string|null $property
-     *
-     * @return string
      */
-    protected function convertToArrayDateTime(\DateTimeInterface $value, string $property = null): string
+    protected function convertToArrayDateTime(DateTimeInterface $value, ?string $property = null): string
     {
-        return $value->format(\DateTimeInterface::ATOM);
+        return $value->format(DateTimeInterface::ATOM);
     }
 
     /**
      * Converts array data to array
-     * @param array $data
-     * @param string|null $property
-     *
-     * @return array
      */
     protected function convertToArrayData(array $data, ?string $property = null): array
     {
@@ -95,14 +85,13 @@ trait ToArrayConvertibleTrait
 
     /**
      * Returns not convertible properties
-     * @return array|string[]
      */
     protected function getToArrayNotConvertibleProperties(): array
     {
         foreach (['TO_ARRAY_NOT_CONVERTIBLE_PROPERTIES', 'ARRAY_NOT_CONVERTIBLE_PROPERTIES'] as $constant) {
             try {
-                return (array) (new \ReflectionClassConstant(static::class, $constant))->getValue();
-            } catch (\ReflectionException $e) {
+                return (array) (new ReflectionClassConstant(static::class, $constant))->getValue();
+            } catch (ReflectionException) {
             }
         }
 

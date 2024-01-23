@@ -11,6 +11,8 @@
 
 namespace Dmytrof\ArrayConvertible\Exception;
 
-class ArrayConvertibleException extends \RuntimeException
+use RuntimeException;
+
+class ArrayConvertibleException extends RuntimeException
 {
 }

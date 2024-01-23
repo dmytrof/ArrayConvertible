@@ -15,7 +15,6 @@ interface MergeArrayInterface
 {
     /**
      * Merges array data to object
-     * @param array $data
      */
     public function mergeArray(array $data): void;
 }
