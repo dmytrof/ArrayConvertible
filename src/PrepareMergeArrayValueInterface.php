@@ -16,5 +16,5 @@ interface PrepareMergeArrayValueInterface
     /**
      * Prepares merge array value to set to object
      */
-    public function prepareMergeArrayValue(mixed $value): static;
+    public function prepareMergeArrayValue(mixed $value): mixed;
 }

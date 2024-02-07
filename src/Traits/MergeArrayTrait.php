@@ -13,9 +13,11 @@ namespace Dmytrof\ArrayConvertible\Traits;
 
 use DateTime;
 use DateTimeInterface;
+use Dmytrof\ArrayConvertible\Attribute\NestedType;
 use Dmytrof\ArrayConvertible\Exception\MergeArrayException;
 use Dmytrof\ArrayConvertible\MergeArrayInterface;
 use Dmytrof\ArrayConvertible\PrepareMergeArrayValueInterface;
+use ReflectionAttribute;
 use ReflectionClassConstant;
 use ReflectionException;
 use ReflectionProperty;
@@ -39,25 +41,43 @@ trait MergeArrayTrait
      */
     protected function mergeArrayValue(string $property, mixed $value, mixed $dataValue): void
     {
-        $method = 'set' . \ucfirst($property);
-        $setValue = function ($dataValue) use ($property, $method) {
-            if (\method_exists($this, $method)) {
-                $this->$method($dataValue);
-            } else {
-                $this->$property = $dataValue;
-            }
-        };
         try {
-            $propertyType = (new ReflectionProperty($this, $property))->getType();
+            $propertyRef = (new ReflectionProperty($this, $property));
+            $propertyType = $propertyRef->getType();
         } catch (ReflectionException $e) {
             throw new MergeArrayException(\sprintf(
                 'Unable to set \'%s\' property',
                 $property,
             ));
         }
+        $method = 'set' . \ucfirst($property);
+        $setValue = function ($dataValue) use ($property, $value, $method, $propertyRef) {
+            if (\is_array($dataValue)) {
+                $nestedAttr = $propertyRef->getAttributes(NestedType::class)[0] ?? null;
+                if ($nestedAttr instanceof ReflectionAttribute) {
+                    $data = [];
+                    foreach ($dataValue as $item) {
+                        $data[] = $this->mergeArrayCreateObject(
+                            $property,
+                            $value,
+                            $item,
+                            $nestedAttr->newInstance()->getClass(),
+                            $propertyRef->getType()?->allowsNull() ?? true,
+                        );
+                    }
+                    $dataValue = $data;
+                }
+            }
+
+            if (\method_exists($this, $method)) {
+                $this->$method($dataValue);
+            } else {
+                $this->$property = $dataValue;
+            }
+        };
 
         $typeName = $propertyType?->getName();
-        $typeIsNullable = $propertyType?->allowsNull();
+        $typeIsNullable = $propertyType?->allowsNull() ?? true;
         if (\in_array($typeName, ['string', 'int', 'float', 'bool', 'array'], true)) { // is scalar or array
             if (!(\is_null($dataValue) && $typeIsNullable)) {
                 \settype($dataValue, $typeName);
@@ -66,55 +86,20 @@ trait MergeArrayTrait
 
             return;
         }
-        if (\is_a($typeName, \DateTimeInterface::class, true)) { // date time
-            if (!(\is_null($dataValue) && $typeIsNullable)) {
-                $dataValue = $this->mergeArrayCreateDateTimeObject($property, $value, $dataValue, $typeName);
-            }
-            $setValue->call($this, $dataValue);
+
+        try {
+            $setValue->call($this, $this->mergeArrayCreateObject(
+                $property,
+                $value,
+                $dataValue,
+                $typeName,
+                $typeIsNullable,
+            ));
 
             return;
+        } catch (MergeArrayException $e) {
         }
-        if (\is_a($typeName, PrepareMergeArrayValueInterface::class, true)) {
-            if (!$value instanceof PrepareMergeArrayValueInterface) {
-                throw new MergeArrayException(\sprintf(
-                    'Unable to prepare value for \'%s\' property \'%s\' which is not object',
-                    PrepareMergeArrayValueInterface::class,
-                    $property,
-                ));
-            }
-            $setValue->call($this, $value->prepareMergeArrayValue($dataValue));
 
-            return;
-        }
-        if (\is_a($typeName, MergeArrayInterface::class, true)) {
-            if (
-                (!$typeIsNullable || \is_array($dataValue))
-                && !$value instanceof MergeArrayInterface
-            ) {
-                try {
-                    $value = new $typeName();
-                    $setValue->call($this, $value);
-                } catch (Throwable $e) {
-                    throw new MergeArrayException(\sprintf(
-                        'Unable to instantiate \'%s\' property \'%s\' with \'%s\' object: %s',
-                        MergeArrayInterface::class,
-                        $property,
-                        $typeName,
-                        $e->getMessage(),
-                    ));
-                }
-            }
-
-            if (\is_array($dataValue) && $value instanceof MergeArrayInterface) {
-                $value->mergeArray($dataValue);
-            }
-
-            if (\is_null($dataValue) && $typeIsNullable) {
-                $setValue->call($this, null);
-            }
-
-            return;
-        }
         if (\is_null($typeName)) {
             if ($value instanceof MergeArrayInterface) {
                 $value->mergeArray($dataValue);
@@ -126,23 +111,73 @@ trait MergeArrayTrait
         }
 
         throw new MergeArrayException(\sprintf(
-            'Unsupported merge array type \'%s\'',
+            'Unsupported merge array type \'%s\' for property \'%s\'',
+            $typeName,
             $property,
         ));
     }
 
-    /**
-     * Creates date time object
-     */
-    protected function mergeArrayCreateDateTimeObject(
+    protected function mergeArrayCreateObject(
         string $property,
         mixed $value,
         mixed $dataValue,
-        ?string $typeName,
-    ): ?DateTimeInterface {
-        $dateTimeClass = DateTimeInterface::class === $typeName ? DateTime::class : $typeName;
+        ?string $class,
+        bool $typeIsNullable,
+    ): ?object {
+        if (\is_a($class, DateTimeInterface::class, true)) { // date time
+            if (!(\is_null($dataValue) && $typeIsNullable)) {
+                $dateTimeClass = DateTimeInterface::class === $class ? DateTime::class : $class;
 
-        return new $dateTimeClass($dataValue);
+                return new $dateTimeClass($dataValue);
+            }
+
+            return null;
+        }
+        if (\is_a($class, PrepareMergeArrayValueInterface::class, true)) {
+            if (!(\is_null($dataValue) && $typeIsNullable)) {
+                try {
+                    return (new $class())->prepareMergeArrayValue($dataValue);
+                } catch (Throwable) {
+                    if (!$value instanceof PrepareMergeArrayValueInterface) {
+                        throw new MergeArrayException(\sprintf(
+                            'Unable to prepare value for \'%s\' property \'%s\' which is not object',
+                            PrepareMergeArrayValueInterface::class,
+                            $property,
+                        ));
+                    }
+
+                    return $value->prepareMergeArrayValue($dataValue);
+                }
+            }
+
+            return null;
+        }
+        if (\is_a($class, MergeArrayInterface::class, true)) {
+            if (
+                (!$typeIsNullable || \is_array($dataValue))
+                && !$value instanceof MergeArrayInterface
+            ) {
+                try {
+                    $value = new $class();
+                } catch (Throwable $e) {
+                    throw new MergeArrayException(\sprintf(
+                        'Unable to instantiate \'%s\' property \'%s\' with \'%s\' object: %s',
+                        MergeArrayInterface::class,
+                        $property,
+                        $class,
+                        $e->getMessage(),
+                    ));
+                }
+            }
+            if (\is_array($dataValue) && $value instanceof MergeArrayInterface) {
+                $value->mergeArray($dataValue);
+
+                return $value;
+            }
+
+            return null;
+        }
+        throw new MergeArrayException('Unsupported type class');
     }
 
     /**
